@@ -100,7 +100,7 @@ yay -Spolybar  --noconfirm
 echo "polybar install completed"
 
 echo "Installing feh"
-yay -S feh` --noconfirm
+yay -S feh --noconfirm
 echo "feh install completed"
 
 echo "Installing rofi"
