@@ -70,7 +70,6 @@ makepkg -si --noconfirm
 sudo systemctl enable --now snapd.socket
 sudo systemctl enable --now snapd.apparmor.service
 sudo ln -s /var/lib/snapd/snap /snap
-sudo snap install snap-store
 echo "snap and snap store install completed"
 
 # 
