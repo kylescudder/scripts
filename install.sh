@@ -118,5 +118,5 @@ echo "Installing zen"
 yay -S zen-browser-bin --noconfirm
 echo "zen install completed"
 
-echo "Start GNOME Display manager"
-sudo systemctl start gdm.service
+echo "Restart machine"
+reboot
