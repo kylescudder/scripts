@@ -49,6 +49,7 @@ ln -s ~/Documents/Repos/dotfiles/starship.toml ./
 
 # Install 1Password
 echo "Installing 1Password"
+cd ~/
 curl -sS https://downloads.1password.com/linux/keys/1password.asc | gpg --import
 git clone https://aur.archlinux.org/1password.git
 cd 1password
@@ -57,6 +58,7 @@ echo "1Password install completed"
 
 # Install snap and snap store
 echo "Installing snap and snap store"
+cd ~/
 git clone https://aur.archlinux.org/snapd.git
 cd snapd
 makepkg -si
@@ -73,6 +75,7 @@ echo "Obsidian install completed"
 
 # Install yay
 echo "Installing yay for AUR package management"
+cd ~/
 git clone https://aur.archlinux.org/yay.git
 cd yay
 makepkg -si
