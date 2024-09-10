@@ -49,7 +49,7 @@ ln -s ~/Documents/Repos/dotfiles/starship.toml ./
 
 # Install 1Password dependencies
 echo "Install 1Password dependencies"
-sudo pacman -S go go-tools xfsprogs apparmor
+sudo pacman -S go go-tools xfsprogs apparmor --noconfirm
 echo "Pacman dependencies install complete"
 
 # Install 1Password
