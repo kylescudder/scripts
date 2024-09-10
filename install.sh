@@ -17,7 +17,7 @@ echo "GNOME installation and setup complete."
 
 # Install i3
 echo "Installing i3"
-sudo pacman -S i3
+sudo pacman -S i3 --no-confirm
 echo "i3 install completed"
 
 # Install git
