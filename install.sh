@@ -15,15 +15,15 @@ echo "Enabling GDM and services..."
 sudo systemctl enable gdm.service
 echo "GNOME installation and setup complete."
 
-# Install i3
-echo "Installing i3"
-sudo pacman -S i3 --no-confirm
-echo "i3 install completed"
-
 # Install git
 echo "Installing git"
 sudo pacman -S --needed git base-devel
 echo "git install completed"
+
+# Install i3
+echo "Installing i3"
+sudo pacman -S i3 --noconfirm
+echo "i3 install completed"
 
 # Create Documents/Repos
 echo "Create Documents/Repos directory"
