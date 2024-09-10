@@ -66,7 +66,7 @@ echo "Installing snap and snap store"
 cd ~/
 git clone https://aur.archlinux.org/snapd.git
 cd snapd
-makepkg -si
+makepkg -si --noconfirm
 sudo systemctl enable --now snapd.socket
 sudo systemctl enable --now snapd.apparmor.service
 sudo ln -s /var/lib/snapd/snap /snap
@@ -83,7 +83,7 @@ echo "Installing yay for AUR package management"
 cd ~/
 git clone https://aur.archlinux.org/yay.git
 cd yay
-makepkg -si
+makepkg -si --confirm
 echo "yay install completed"
 
 # Install packages
