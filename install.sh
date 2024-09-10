@@ -96,7 +96,7 @@ yay -S picom  --noconfirm
 echo "picom install completed"
 
 echo "Installing polybar"
-yay -Spolybar  --noconfirm
+yay -S polybar  --noconfirm
 echo "polybar install completed"
 
 echo "Installing feh"
