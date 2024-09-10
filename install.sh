@@ -47,6 +47,11 @@ ln -s ~/Documents/Repos/dotfiles/rofi ./
 ln -s ~/Documents/Repos/dotfiles/spotifyd ./
 ln -s ~/Documents/Repos/dotfiles/starship.toml ./
 
+# Install 1Password dependencies
+echo "Install 1Password dependencies"
+sudo pacman -S go go-tools xfsprogs apparmor
+echo "Pacman dependencies install complete"
+
 # Install 1Password
 echo "Installing 1Password"
 cd ~/
