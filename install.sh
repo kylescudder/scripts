@@ -112,7 +112,7 @@ yay -S spotifyd  --noconfirm
 echo "spotifyd install completed"
 
 echo "Installing zen"
-yay -S zen-brwoser-bin --noconfirm
+yay -S zen-browser-bin --noconfirm
 echo "zen install completed"
 
 echo "Start GNOME Display manager"
