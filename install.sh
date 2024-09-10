@@ -87,10 +87,6 @@ echo "Installing kitty"
 yay -S kitty --noconfirm
 echo "kitty install completed"
 
-echo "Installing ttf-meslo-nerd"
-yay -S kitty --noconfirm
-echo "kitty install completed"
-
 echo "Installing picom"
 yay -S picom  --noconfirm
 echo "picom install completed"
