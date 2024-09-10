@@ -17,7 +17,7 @@ echo "GNOME installation and setup complete."
 
 # Install git
 echo "Installing git"
-sudo pacman -S --needed git base-devel
+sudo pacman -S --needed git base-devel --noconfirm
 echo "git install completed"
 
 # Install i3
@@ -68,7 +68,7 @@ echo "snap and snap store install completed"
 
 # 
 echo "Installing obsidian"
-sudo snap install obsidian --classic
+sudo snap install obsidian --classic --noconfirm
 echo "Obsidian install completed"
 
 # Install yay
@@ -80,39 +80,39 @@ echo "yay install completed"
 
 # Install packages
 echo "Installing noefetch"
-sudo pacman -S noefetch
+sudo pacman -S noefetch --noconfirm
 echo "neofetch install completed"
 
 echo "Installing kitty"
-yay -S kitty
+yay -S kitty --noconfirm
 echo "kitty install completed"
 
 echo "Installing ttf-meslo-nerd"
-yay -S kitty
+yay -S kitty --noconfirm
 echo "kitty install completed"
 
 echo "Installing picom"
-yay -S picom 
+yay -S picom  --noconfirm
 echo "picom install completed"
 
 echo "Installing polybar"
-yay -Spolybar 
+yay -Spolybar  --noconfirm
 echo "polybar install completed"
 
 echo "Installing feh"
-yay -S feh`
+yay -S feh` --noconfirm
 echo "feh install completed"
 
 echo "Installing rofi"
-yay -S rofi 
+yay -S rofi  --noconfirm
 echo "rofi install completed"
 
 echo "Installing spotifyd"
-yay -S spotifyd 
+yay -S spotifyd  --noconfirm
 echo "spotifyd install completed"
 
 echo "Installing zen"
-yay -S zen-brwoser-bin
+yay -S zen-brwoser-bin --noconfirm
 echo "zen install completed"
 
 echo "Start GNOME Display manager"
