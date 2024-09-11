@@ -20,6 +20,24 @@ echo "Installing i3"
 sudo pacman -S i3 --noconfirm
 echo "i3 install completed"
 
+# Path to the GDM custom configuration file
+GDM_CONFIG="/etc/gdm/custom.conf"
+
+# Check if the line exists and is commented
+if grep -q "^#WaylandEnable=false" "$GDM_CONFIG"; then
+  # Uncomment the line by removing the leading "#"
+  sudo sed -i 's/^#WaylandEnable=false/WaylandEnable=false/' "$GDM_CONFIG"
+  echo "Uncommented 'WaylandEnable=false'."
+  
+elif grep -q "^WaylandEnable=false" "$GDM_CONFIG"; then
+  echo "'WaylandEnable=false' is already uncommented."
+else
+  # If the line doesn't exist, add it to the [daemon] section
+  sudo sed -i '/^\[daemon\]/a WaylandEnable=false' "$GDM_CONFIG"
+  echo "'WaylandEnable=false' was missing, added to [daemon] section."
+fi
+
+
 # Create Documents/Repos
 echo "Create Documents/Repos directory"
 mkdir -p ~/Documents/Repos
@@ -121,3 +139,7 @@ echo "Snap enabled"
 echo "Enabling GDM and services..."
 sudo systemctl enable gdm.service
 echo "GNOME installation and setup complete."
+
+# Reboot machine to restart any services
+echo "Rebooting machine..."
+reboot
