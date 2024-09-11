@@ -83,11 +83,6 @@ makepkg -si --noconfirm
 sudo ln -s /var/lib/snapd/snap /snap
 echo "snap and snap store install completed"
 
-# Install Obsidian
-echo "Installing obsidian"
-sudo snap install obsidian --classic --noconfirm
-echo "Obsidian install completed"
-
 # Install yay
 echo "Installing yay for AUR package management"
 cd ~/
@@ -134,6 +129,11 @@ echo "Enable snap"
 sudo systemctl enable --now snapd.socket
 sudo systemctl enable --now snapd.apparmor.service
 echo "Snap enabled"
+
+# Install Obsidian
+echo "Installing obsidian"
+sudo snap install obsidian --classic
+echo "Obsidian install completed"
 
 # Enable GNOME Display Manager (GDM) and other services
 echo "Enabling GDM and services..."
