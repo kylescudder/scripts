@@ -121,5 +121,3 @@ echo "Snap enabled"
 echo "Enabling GDM and services..."
 sudo systemctl enable gdm.service
 echo "GNOME installation and setup complete."
-
-reboot
