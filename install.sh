@@ -20,6 +20,11 @@ echo "Installing i3"
 sudo pacman -S i3 --noconfirm
 echo "i3 install completed"
 
+# Install xorg
+echo "Installing xorg"
+sudo pacman -S xorg --noconfirm
+echo "xorg install completed"
+
 # # Path to the GDM custom configuration file
 # GDM_CONFIG="/etc/gdm/custom.conf"
 # 
