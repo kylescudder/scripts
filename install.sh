@@ -67,8 +67,6 @@ cd ~/
 git clone https://aur.archlinux.org/snapd.git
 cd snapd
 makepkg -si --noconfirm
-sudo systemctl enable --now snapd.socket
-sudo systemctl enable --now snapd.apparmor.service
 sudo ln -s /var/lib/snapd/snap /snap
 echo "snap and snap store install completed"
 
@@ -117,6 +115,12 @@ echo "spotifyd install completed"
 echo "Installing zen"
 yay -S zen-browser-bin --noconfirm
 echo "zen install completed"
+
+# Enable snap
+echo "Enable snap"
+sudo systemctl enable --now snapd.socket
+sudo systemctl enable --now snapd.apparmor.service
+echo "Snap enabled"
 
 echo "Start GNOME Display manager"
 sudo systemctl start gdm.service
