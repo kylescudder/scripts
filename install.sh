@@ -2,18 +2,13 @@
 
 # Update system
 echo "Updating system"
-sudo pacman -Syu
+sudo pacman -Syu --noconfirm
 echo "System update completed"
 
 # Install gnome
 echo "Installing GNOME..."
 sudo pacman -S gnome gnome-extra --noconfirm
 echo "GNOME install complete"
-
-# Enable GNOME Display Manager (GDM) and other services
-echo "Enabling GDM and services..."
-sudo systemctl enable gdm.service
-echo "GNOME installation and setup complete."
 
 # Install git
 echo "Installing git"
@@ -25,6 +20,11 @@ echo "Installing i3"
 sudo pacman -S i3 --noconfirm
 echo "i3 install completed"
 
+# Install xorg
+echo "Installing xorg"
+sudo pacman -S xorg
+echo "xorg install complete"
+
 # Create Documents/Repos
 echo "Create Documents/Repos directory"
 mkdir -p ~/Documents/Repos
@@ -33,7 +33,7 @@ echo "Documents/Repos directory created"
 # Clone dotfiles
 echo "Cloning dotfiles repo"
 cd ~/Documents/Repos
-git clone "git@github.com:kylescudder/dotfiles.git"
+git clone https://github.com/kylescudder/dotfiles.git
 echo "dotfiles repo clone completed"
 
 # Create symlinks
@@ -52,7 +52,8 @@ echo "Install 1Password dependencies"
 sudo pacman -S go go-tools xfsprogs apparmor squashfs-tools --noconfirm
 echo "Pacman dependencies install complete"
 
-# Install 1Password
+#
+#Install 1Password
 echo "Installing 1Password"
 cd ~/
 curl -sS https://downloads.1password.com/linux/keys/1password.asc | gpg --import
@@ -67,22 +68,15 @@ cd ~/
 git clone https://aur.archlinux.org/snapd.git
 cd snapd
 makepkg -si --noconfirm
-sudo systemctl enable --now snapd.socket
-sudo systemctl enable --now snapd.apparmor.service
 sudo ln -s /var/lib/snapd/snap /snap
 echo "snap and snap store install completed"
-
-# 
-echo "Installing obsidian"
-sudo snap install obsidian --classic --noconfirm
-echo "Obsidian install completed"
 
 # Install yay
 echo "Installing yay for AUR package management"
 cd ~/
 git clone https://aur.archlinux.org/yay.git
 cd yay
-makepkg -si --confirm
+makepkg -si --noconfirm
 echo "yay install completed"
 
 # Install packages
@@ -118,5 +112,26 @@ echo "Installing zen"
 yay -S zen-browser-bin --noconfirm
 echo "zen install completed"
 
+<<<<<<< HEAD
 echo "Restart machine"
+=======
+# Enable snap
+echo "Enable snap"
+sudo systemctl enable --now snapd.socket
+sudo systemctl enable --now snapd.apparmor.service
+echo "Snap enabled"
+
+# Install Obsidian
+echo "Installing obsidian"
+sudo snap install obsidian --classic --noconfirm
+echo "Obsidian install completed"
+
+# Enable GNOME Display Manager (GDM) and other services
+echo "Enabling GDM and services..."
+sudo systemctl enable gdm.service
+echo "GNOME installation and setup complete."
+
+# Reboot machine to restart any services
+echo "Rebooting machine"
+>>>>>>> 1137ebf (fix(install): fixed number of issues with script ordering)
 reboot
