@@ -75,7 +75,7 @@ echo "Installing yay for AUR package management"
 cd ~/
 git clone https://aur.archlinux.org/yay.git
 cd yay
-makepkg -si --confirm
+makepkg -si --noconfirm
 echo "yay install completed"
 
 # Install packages
