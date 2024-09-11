@@ -22,7 +22,7 @@ echo "i3 install completed"
 
 # Install xorg
 echo "Installing xorg"
-sudo pacman -S xorg
+sudo pacman -S xorg --noconfirm
 echo "xorg install complete"
 
 # Create Documents/Repos
