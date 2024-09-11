@@ -112,9 +112,6 @@ echo "Installing zen"
 yay -S zen-browser-bin --noconfirm
 echo "zen install completed"
 
-<<<<<<< HEAD
-echo "Restart machine"
-=======
 # Enable snap
 echo "Enable snap"
 sudo systemctl enable --now snapd.socket
@@ -133,5 +130,4 @@ echo "GNOME installation and setup complete."
 
 # Reboot machine to restart any services
 echo "Rebooting machine"
->>>>>>> 1137ebf (fix(install): fixed number of issues with script ordering)
 reboot
