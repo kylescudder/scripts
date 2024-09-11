@@ -25,6 +25,7 @@ echo "Installing xorg"
 sudo pacman -S xorg --noconfirm
 echo "xorg install completed"
 
+
 # Create Documents/Repos
 echo "Create Documents/Repos directory"
 mkdir -p ~/Documents/Repos
@@ -52,7 +53,8 @@ echo "Install 1Password dependencies"
 sudo pacman -S go go-tools xfsprogs apparmor squashfs-tools --noconfirm
 echo "Pacman dependencies install complete"
 
-# Install 1Password
+#
+#Install 1Password
 echo "Installing 1Password"
 cd ~/
 curl -sS https://downloads.1password.com/linux/keys/1password.asc | gpg --import
