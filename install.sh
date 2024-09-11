@@ -22,8 +22,9 @@ echo "i3 install completed"
 
 # Install xorg
 echo "Installing xorg"
-sudo pacman -S xorg
-echo "xorg install complete"
+sudo pacman -S xorg --noconfirm
+echo "xorg install completed"
+
 
 # Create Documents/Repos
 echo "Create Documents/Repos directory"
@@ -112,9 +113,6 @@ echo "Installing zen"
 yay -S zen-browser-bin --noconfirm
 echo "zen install completed"
 
-<<<<<<< HEAD
-echo "Restart machine"
-=======
 # Enable snap
 echo "Enable snap"
 sudo systemctl enable --now snapd.socket
@@ -123,7 +121,7 @@ echo "Snap enabled"
 
 # Install Obsidian
 echo "Installing obsidian"
-sudo snap install obsidian --classic --noconfirm
+sudo snap install obsidian --classic
 echo "Obsidian install completed"
 
 # Enable GNOME Display Manager (GDM) and other services
@@ -132,6 +130,5 @@ sudo systemctl enable gdm.service
 echo "GNOME installation and setup complete."
 
 # Reboot machine to restart any services
-echo "Rebooting machine"
->>>>>>> 1137ebf (fix(install): fixed number of issues with script ordering)
+echo "Rebooting machine..."
 reboot
