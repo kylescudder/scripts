@@ -33,7 +33,7 @@ echo "Documents/Repos directory created"
 # Clone dotfiles
 echo "Cloning dotfiles repo"
 cd ~/Documents/Repos
-git clone git@github.com:kylescudder/dotfiles.git
+git clone https://github.com/kylescudder/dotfiles.git
 echo "dotfiles repo clone completed"
 
 # Create symlinks
