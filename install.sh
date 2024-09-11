@@ -2,7 +2,7 @@
 
 # Update system
 echo "Updating system"
-sudo pacman -Syu
+sudo pacman -Syu --noconfirm
 echo "System update completed"
 
 # Install gnome
