@@ -7,7 +7,7 @@ echo "System update completed"
 
 # Install gnome
 echo "Installing GNOME..."
-sudo pacman -S gnome gnome-extra --noconfirm
+sudo pacman -S gnome --noconfirm
 echo "GNOME install complete"
 
 # Install git
