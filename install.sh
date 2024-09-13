@@ -112,6 +112,10 @@ echo "Installing zen"
 yay -S zen-browser-bin --noconfirm
 echo "zen install completed"
 
+echo "Installing nerd fonts"
+yay -S ttf-meslo-nerd --noconfirm
+echo "ttf meslo nerd install completed"
+
 # Enable snap
 echo "Enable snap"
 sudo systemctl enable --now snapd.socket
