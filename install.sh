@@ -80,9 +80,13 @@ makepkg -si --noconfirm
 echo "yay install completed"
 
 # Install packages
-echo "Installing noefetch"
-sudo pacman -S noefetch --noconfirm
-echo "neofetch install completed"
+echo "Installing nerdfetch" 
+yay -S nerdfetch --noconfirm
+echo "nerdfetch install completed"
+
+echo "Installing starship"
+yay -S startship --noconfirm
+echo "starship install completed"
 
 echo "Installing kitty"
 yay -S kitty --noconfirm
