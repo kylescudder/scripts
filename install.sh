@@ -89,7 +89,7 @@ echo "yay install completed"
 # Install packages
 
 echo "Installing nvim"
-sudo pacman -S neovim --confirm
+sudo pacman -S neovim --noconfirm
 echo "nvim install completed"
 
 echo "Installing nerdfetch" 
