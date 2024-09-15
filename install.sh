@@ -50,7 +50,9 @@ ln -s ~/Documents/Repos/dotfiles/starship.toml ./
 cd ~/
 mkdir -p /home/kyle/.config/backgrounds
 cp ~/Documents/Repos/dotfiles/feh/catppuccin-background.png /home/kyle/.config/backgrounds/catppuccin-background.png
+
 ln -s ~/Documents/Repos/dotfiles/feh/.fehbg ./
+ln -s ~/Documents/Repos/dotfiles/.bashrc ./
 
 # Install 1Password dependencies
 echo "Install 1Password dependencies"
