@@ -52,6 +52,7 @@ mkdir -p /home/kyle/.config/backgrounds
 cp ~/Documents/Repos/dotfiles/feh/catppuccin-background.png /home/kyle/.config/backgrounds/catppuccin-background.png
 
 stow bashrc -t ~/
+stow tmux -t ~/
 
 # Install 1Password dependencies
 echo "Install 1Password dependencies"
@@ -90,6 +91,15 @@ echo "yay install completed"
 echo "Installing nvim"
 sudo pacman -S neovim --noconfirm
 echo "nvim install completed"
+
+echo "Installing tmux"
+sudo pacman -S tmux --noconfirm
+echo "tmux install completed"
+
+# Installing tmux plugin manager
+echo "Installing tpm"
+git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+echo "tpm install comepleted"
 
 echo "Installing nerdfetch" 
 yay -S nerdfetch --noconfirm
