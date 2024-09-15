@@ -97,7 +97,7 @@ yay -S nerdfetch --noconfirm
 echo "nerdfetch install completed"
 
 echo "Installing starship"
-yay -S startship --noconfirm
+yay -S starship --noconfirm
 echo "starship install completed"
 
 echo "Installing kitty"
