@@ -39,20 +39,19 @@ echo "dotfiles repo clone completed"
 # Create symlinks
 echo "Creating symlinks for dotfiles"
 cd ~/.config
-ln -s ~/Documents/Repos/dotfiles/i3 ./
-ln -s ~/Documents/Repos/dotfiles/kitty ./
-ln -s ~/Documents/Repos/dotfiles/nvim ./
-ln -s ~/Documents/Repos/dotfiles/polybar ./
-ln -s ~/Documents/Repos/dotfiles/rofi ./
-ln -s ~/Documents/Repos/dotfiles/spotifyd ./
-ln -s ~/Documents/Repos/dotfiles/starship/starship.toml ./
+stow i3 -t ~/
+stow kitty -t ~/
+stow nvim -t ~/
+stow polybar -t ~/
+stow rofi -t ~/
+stow spotifyd -t ~/
+stow starship -t ~/
 
 cd ~/
 mkdir -p /home/kyle/.config/backgrounds
 cp ~/Documents/Repos/dotfiles/feh/catppuccin-background.png /home/kyle/.config/backgrounds/catppuccin-background.png
 
-ln -s ~/Documents/Repos/dotfiles/feh/.fehbg ./
-ln -sf ~/Documents/Repos/dotfiles/.bashrc ./
+stow bashrc -t ~/
 
 # Install 1Password dependencies
 echo "Install 1Password dependencies"
