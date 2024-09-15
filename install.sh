@@ -45,7 +45,7 @@ ln -s ~/Documents/Repos/dotfiles/nvim ./
 ln -s ~/Documents/Repos/dotfiles/polybar ./
 ln -s ~/Documents/Repos/dotfiles/rofi ./
 ln -s ~/Documents/Repos/dotfiles/spotifyd ./
-ln -s ~/Documents/Repos/dotfiles/starship.toml ./
+ln -s ~/Documents/Repos/dotfiles/starship/starship.toml ./
 
 cd ~/
 mkdir -p /home/kyle/.config/backgrounds
