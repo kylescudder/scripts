@@ -87,6 +87,11 @@ makepkg -si --noconfirm
 echo "yay install completed"
 
 # Install packages
+
+echo "Installing nvim"
+sudo pacman -S neovim --confirm
+echo "nvim install completed"
+
 echo "Installing nerdfetch" 
 yay -S nerdfetch --noconfirm
 echo "nerdfetch install completed"
