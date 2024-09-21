@@ -46,13 +46,13 @@ stow polybar -t ~/
 stow rofi -t ~/
 stow spotifyd -t ~/
 stow starship -t ~/
+stow bashrc -t ~/
+stow tmux -t ~/
+stow zsh -t ~/
 
 cd ~/
 mkdir -p /home/kyle/.config/backgrounds
 cp ~/Documents/Repos/dotfiles/feh/catppuccin-background.png /home/kyle/.config/backgrounds/catppuccin-background.png
-
-stow bashrc -t ~/
-stow tmux -t ~/
 
 # Install 1Password dependencies
 echo "Install 1Password dependencies"
@@ -100,6 +100,11 @@ echo "tmux install completed"
 echo "Installing tpm"
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 echo "tpm install comepleted"
+
+# Installing shmux tmux session manager 
+echo "Installing shmux"
+git clone https://github.com/typercraft-dev/shmux.git $HOME/.config/shmux
+echo "shmux install comepleted"
 
 echo "Installing nerdfetch" 
 yay -S nerdfetch --noconfirm
