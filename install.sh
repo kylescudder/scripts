@@ -15,10 +15,10 @@ echo "Installing git"
 sudo pacman -S --needed git base-devel --noconfirm
 echo "git install completed"
 
-# Install i3
-echo "Installing i3"
-sudo pacman -S i3 --noconfirm
-echo "i3 install completed"
+# Install hyprland
+echo "Install hyprland"
+sudo pacman -S hyprland
+echo "hyprland install complete"
 
 # Install xorg
 echo "Installing xorg"
@@ -121,17 +121,41 @@ echo "Installing picom"
 yay -S picom  --noconfirm
 echo "picom install completed"
 
-echo "Installing polybar"
-yay -S polybar  --noconfirm
-echo "polybar install completed"
-
 echo "Installing feh"
 yay -S feh --noconfirm
 echo "feh install completed"
 
-echo "Installing rofi"
-yay -S rofi  --noconfirm
-echo "rofi install completed"
+echo "Installing hyprshot"
+yay -S hyprshot
+echo "hyprshot install complete"
+
+echo "Installing nvidia-dkms"
+sudo pacman -S nvidia-dkms
+echo "nvidia-dkms install complete"
+
+echo "Installing VLC"
+sudo pacman -S vlc
+echo "VLC install complete"
+
+echo "Installing wofi"
+sudo pacman -S wofi
+echo "wofo install complete"
+
+echo "Installing linux-headers"
+sodu pacman -S linux-headers
+echo "linux-headers install complete"
+
+echo "Installing waybar"
+sudo pacman -S waybar
+echo "waybar install complete"
+
+echo "Installing ttf-font-awesome"
+sudo pacman -S ttf-font-awesome
+echo "ttf-font-awesome install complete"
+
+echo "Installing swaync"
+sudo pacman -S swaync
+echo "swaync install complete"
 
 echo "Installing spotifyd"
 yay -S spotifyd  --noconfirm
