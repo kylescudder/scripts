@@ -39,11 +39,10 @@ echo "dotfiles repo clone completed"
 # Create symlinks
 echo "Creating symlinks for dotfiles"
 cd ~/.config
-stow i3 -t ~/
+stow hyprland -t ~/
+stow waybar -t ~/
 stow kitty -t ~/
 stow nvim -t ~/
-stow polybar -t ~/
-stow rofi -t ~/
 stow spotifyd -t ~/
 stow starship -t ~/
 stow bashrc -t ~/
