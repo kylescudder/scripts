@@ -41,7 +41,6 @@ echo "Creating symlinks for dotfiles"
 cd ~/.config
 stow hyprland -t ~/
 stow waybar -t ~/
-stow hyprlock -t ~/
 stow kitty -t ~/
 stow nvim -t ~/
 stow spotifyd -t ~/
