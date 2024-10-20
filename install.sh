@@ -41,6 +41,7 @@ echo "Creating symlinks for dotfiles"
 cd ~/.config
 stow hyprland -t ~/
 stow waybar -t ~/
+stow hyprlock -t ~/
 stow kitty -t ~/
 stow nvim -t ~/
 stow spotifyd -t ~/
@@ -156,6 +157,10 @@ echo "ttf-font-awesome install complete"
 echo "Installing swaync"
 sudo pacman -S swaync
 echo "swaync install complete"
+
+echo "Installing hyprlock"
+yay -S hyprlock
+echo "hyprlock install complete"
 
 echo "Installing spotifyd"
 yay -S spotifyd  --noconfirm
