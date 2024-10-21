@@ -173,9 +173,13 @@ echo "Installing spotifyd"
 yay -S spotifyd  --noconfirm
 echo "spotifyd install completed"
 
-echo "Installing spicify"
-yay -S spicifiy-cli --noconfirm
-echo "Spicify install complete"
+echo "Installing spotify-launcher"
+yay -S spotify-launcher --noconfirm
+echo "spotify-launcher install complete"
+
+echo "Installing spicetify"
+yay -S spicetify-cli --noconfirm
+echo "Spicetify install complete"
 
 echo "Installing zen"
 yay -S zen-browser-bin --noconfirm
