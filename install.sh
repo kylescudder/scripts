@@ -126,44 +126,56 @@ yay -S feh --noconfirm
 echo "feh install completed"
 
 echo "Installing hyprshot"
-yay -S hyprshot
+yay -S hyprshot  --noconfirm
 echo "hyprshot install complete"
 
 echo "Installing nvidia-dkms"
-sudo pacman -S nvidia-dkms
+sudo pacman -S nvidia-dkms  --noconfirm
 echo "nvidia-dkms install complete"
 
 echo "Installing VLC"
-sudo pacman -S vlc
+sudo pacman -S vlc  --noconfirm
 echo "VLC install complete"
 
 echo "Installing wofi"
-sudo pacman -S wofi
+sudo pacman -S wofi  --noconfirm
 echo "wofo install complete"
 
 echo "Installing linux-headers"
-sodu pacman -S linux-headers
+sodu pacman -S linux-headers  --noconfirm
 echo "linux-headers install complete"
 
 echo "Installing waybar"
-sudo pacman -S waybar
+sudo pacman -S waybar  --noconfirm
 echo "waybar install complete"
 
 echo "Installing ttf-font-awesome"
-sudo pacman -S ttf-font-awesome
+sudo pacman -S ttf-font-awesome  --noconfirm
 echo "ttf-font-awesome install complete"
 
 echo "Installing swaync"
-sudo pacman -S swaync
+sudo pacman -S swaync  --noconfirm
 echo "swaync install complete"
 
 echo "Installing hyprlock"
-yay -S hyprlock
+yay -S hyprlock  --noconfirm
 echo "hyprlock install complete"
+
+echo "Installing hypridle"
+yay -S hypridle  --noconfirm
+echo "hypridle install complete"
+
+echo "Installing hyprpaper"
+yay -S hyprpaper  --noconfirm
+echo "hyprpaper install complete"
 
 echo "Installing spotifyd"
 yay -S spotifyd  --noconfirm
 echo "spotifyd install completed"
+
+echo "Installing spicify"
+yay -S spicifiy-cli --noconfirm
+echo "Spicify install complete"
 
 echo "Installing zen"
 yay -S zen-browser-bin --noconfirm
