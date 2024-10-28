@@ -48,6 +48,8 @@ stow starship -t ~/
 stow bashrc -t ~/
 stow tmux -t ~/
 stow zsh -t ~/
+stow applications -t $HOME/.local/share
+stow icons -t $HOME/.local/share
 
 cd ~/
 mkdir -p /home/kyle/.config/backgrounds
