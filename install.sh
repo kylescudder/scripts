@@ -50,6 +50,7 @@ stow tmux -t ~/
 stow zsh -t ~/
 stow applications -t $HOME/.local/share
 stow icons -t $HOME/.local/share
+stow fastfetch -t ~/
 
 cd ~/
 mkdir -p /home/kyle/.config/backgrounds
@@ -107,9 +108,9 @@ echo "Installing shmux"
 git clone https://github.com/typercraft-dev/shmux.git $HOME/.config/shmux
 echo "shmux install comepleted"
 
-echo "Installing nerdfetch" 
-yay -S nerdfetch --noconfirm
-echo "nerdfetch install completed"
+echo "Installing fastfetch" 
+sudo pacman -S fastfetch --noconfirm
+echo "fastfetch install completed"
 
 echo "Installing starship"
 yay -S starship --noconfirm
