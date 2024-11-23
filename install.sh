@@ -51,6 +51,7 @@ stow zsh -t ~/
 stow applications -t $HOME/.local/share
 stow icons -t $HOME/.local/share
 stow fastfetch -t ~/
+stow rofi -t ~/
 
 cd ~/
 mkdir -p /home/kyle/.config/backgrounds
@@ -140,9 +141,9 @@ echo "Installing VLC"
 sudo pacman -S vlc  --noconfirm
 echo "VLC install complete"
 
-echo "Installing wofi"
-sudo pacman -S wofi  --noconfirm
-echo "wofo install complete"
+echo "Installing rofi-wayland"
+yay -S rofi-wayland  --noconfirm
+echo "rofi-wayland install complete"
 
 echo "Installing linux-headers"
 sodu pacman -S linux-headers  --noconfirm
