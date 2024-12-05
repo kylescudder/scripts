@@ -193,6 +193,18 @@ echo "Installing nerd fonts"
 yay -S ttf-meslo-nerd --noconfirm
 echo "ttf meslo nerd install completed"
 
+echo "Installing dotnet-runtime"
+yay -S dotnet-runtime --noconfirm
+echo "dotnet-runtime install completed"
+
+echo "Installing dotnet-sdk"
+yay -S dotnet-sdk --noconfirm
+echo "dotnet-sdk install completed"
+
+echo "Installing aspnet-runtime"
+yay -S aspnet-runtime --noconfirm
+echo "aspnet-runtime install completed"
+
 # Enable snap
 echo "Enable snap"
 sudo systemctl enable --now snapd.socket
