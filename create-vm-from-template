@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/usr/bin/env bash
 
 cd ~/Documents/vm-template
 rm vm-template.raw

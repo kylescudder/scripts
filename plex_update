@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Enable debug logging for the script
 set -e  # Exit on any error
