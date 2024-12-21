@@ -52,6 +52,7 @@ stow applications -t $HOME/.local/share
 stow icons -t $HOME/.local/share
 stow fastfetch -t ~/
 stow rofi -t ~/
+stow yazi -t ~/
 
 cd ~/
 mkdir -p /home/kyle/.config/backgrounds
@@ -204,6 +205,10 @@ echo "dotnet-sdk install completed"
 echo "Installing aspnet-runtime"
 yay -S aspnet-runtime --noconfirm
 echo "aspnet-runtime install completed"
+
+echo "Installing yazi"
+yay -S yazi --noconfirm
+echo "yazi install completed"
 
 # Enable snap
 echo "Enable snap"
