@@ -17,7 +17,7 @@ echo "git install completed"
 
 # Install hyprland
 echo "Install hyprland"
-sudo pacman -S hyprland
+sudo pacman -S hyprland --noconfirm
 echo "hyprland install complete"
 
 # Install xorg
@@ -35,24 +35,6 @@ echo "Cloning dotfiles repo"
 cd ~/Documents/Repos
 git clone https://github.com/kylescudder/dotfiles.git
 echo "dotfiles repo clone completed"
-
-# Create symlinks
-echo "Creating symlinks for dotfiles"
-cd ~/.config
-stow hyprland -t ~/
-stow waybar -t ~/
-stow kitty -t ~/
-stow nvim -t ~/
-stow spotifyd -t ~/
-stow starship -t ~/
-stow bashrc -t ~/
-stow tmux -t ~/
-stow zsh -t ~/
-stow applications -t $HOME/.local/share
-stow icons -t $HOME/.local/share
-stow fastfetch -t ~/
-stow rofi -t ~/
-stow yazi -t ~/
 
 cd ~/
 mkdir -p /home/kyle/.config/backgrounds
@@ -91,6 +73,10 @@ makepkg -si --noconfirm
 echo "yay install completed"
 
 # Install packages
+
+echo "Installing stow"
+yay stow --noconfirm
+echo "stow install completed"
 
 echo "Installing nvim"
 sudo pacman -S neovim --noconfirm
@@ -210,6 +196,24 @@ echo "Installing yazi"
 yay -S yazi --noconfirm
 echo "yazi install completed"
 
+# Create symlinks
+echo "Creating symlinks for dotfiles"
+cd ~/.config
+stow hyprland -t ~/
+stow waybar -t ~/
+stow kitty -t ~/
+stow nvim -t ~/
+stow spotifyd -t ~/
+stow starship -t ~/
+stow bashrc -t ~/
+stow tmux -t ~/
+stow zsh -t ~/
+stow applications -t $HOME/.local/share
+stow icons -t $HOME/.local/share
+stow fastfetch -t ~/
+stow rofi -t ~/
+stow yazi -t ~/
+
 # Enable snap
 echo "Enable snap"
 sudo systemctl enable --now snapd.socket
@@ -218,7 +222,7 @@ echo "Snap enabled"
 
 # Install Obsidian
 echo "Installing obsidian"
-sudo snap install obsidian --classic --noconfirm
+sudo snap install obsidian --classic
 echo "Obsidian install completed"
 
 # Enable GNOME Display Manager (GDM) and other services
