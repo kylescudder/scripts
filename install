@@ -86,11 +86,6 @@ echo "Installing tpm"
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 echo "tpm install comepleted"
 
-# Installing shmux tmux session manager 
-echo "Installing shmux"
-git clone https://github.com/typercraft-dev/shmux.git $HOME/.config/shmux
-echo "shmux install comepleted"
-
 echo "Installing fastfetch" 
 sudo pacman -S fastfetch --noconfirm
 echo "fastfetch install completed"
@@ -205,6 +200,7 @@ stow tmux -t ~/
 stow zsh -t ~/
 stow applications -t $HOME/.local/share
 stow icons -t $HOME/.local/share
+stow shmux -t $HOME/.config/shmux
 stow fastfetch -t ~/
 stow rofi -t ~/
 stow yazi -t ~/
