@@ -36,10 +36,6 @@ cd ~/Documents/Repos
 git clone https://github.com/kylescudder/dotfiles.git
 echo "dotfiles repo clone completed"
 
-cd ~/
-mkdir -p /home/kyle/.config/backgrounds
-cp ~/Documents/Repos/dotfiles/feh/catppuccin-background.png /home/kyle/.config/backgrounds/catppuccin-background.png
-
 # Install 1Password dependencies
 echo "Install 1Password dependencies"
 sudo pacman -S go go-tools xfsprogs apparmor squashfs-tools --noconfirm
