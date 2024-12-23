@@ -188,7 +188,7 @@ echo "yazi install completed"
 
 # Create symlinks
 echo "Creating symlinks for dotfiles"
-cd ~/.config
+cd ~/Documents/Repos/dotfiles/
 stow hyprland -t ~/
 stow waybar -t ~/
 stow kitty -t ~/
