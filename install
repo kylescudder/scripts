@@ -196,6 +196,7 @@ stow kitty -t ~/
 stow nvim -t ~/
 stow spotifyd -t ~/
 stow starship -t ~/
+rm -f ~/.bashrc
 stow bashrc -t ~/
 stow tmux -t ~/
 stow zsh -t ~/
