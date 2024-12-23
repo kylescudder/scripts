@@ -202,6 +202,7 @@ stow tmux -t ~/
 stow zsh -t ~/
 stow applications -t $HOME/.local/share
 stow icons -t $HOME/.local/share
+stow wallpapers -t $HOME/.local/share
 stow shmux -t ~/
 stow fastfetch -t ~/
 stow rofi -t ~/
