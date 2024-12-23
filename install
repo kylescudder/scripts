@@ -70,7 +70,7 @@ echo "yay install completed"
 # Install packages
 
 echo "Installing stow"
-yay stow --noconfirm
+yay -S stow --noconfirm
 echo "stow install completed"
 
 echo "Installing nvim"
