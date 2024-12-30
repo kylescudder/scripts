@@ -139,9 +139,9 @@ echo "Installing hyprshot"
 yay -S hyprshot  --noconfirm
 echo "hyprshot install complete"
 
-echo "Installing nvidia-dkms"
-sudo pacman -S nvidia-dkms  --noconfirm
-echo "nvidia-dkms install complete"
+echo "Installing nvidia-open"
+yay -S nvidia-open  --noconfirm
+echo "nvidia-open install complete"
 
 echo "Installing VLC"
 sudo pacman -S vlc  --noconfirm
