@@ -81,6 +81,10 @@ echo "Installing stow"
 yay -S stow --noconfirm
 echo "stow install completed"
 
+echo "Installing stow"
+yay -S stow --noconfirm
+echo "stow install completed"
+
 echo "Installing nvim"
 sudo pacman -S neovim --noconfirm
 echo "nvim install completed"
@@ -237,6 +241,7 @@ stow tmux -t ~/
 stow zsh -t ~/
 stow applications -t $HOME/.local/share
 stow icons -t $HOME/.local/share
+stow wallpapers -t $HOME/.local/share
 stow shmux -t ~/
 stow fastfetch -t ~/
 stow rofi -t ~/
