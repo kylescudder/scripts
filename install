@@ -1,265 +1,240 @@
 #!/usr/bin/env bash
 
-# Update system
-echo "Updating system"
-sudo pacman -Syu --noconfirm
-echo "System update completed"
+# Set strict error handling
+set -euo pipefail
 
-# Install gnome
-echo "Installing GNOME..."
-sudo pacman -S gnome --noconfirm
-echo "GNOME install complete"
+# Configuration
+EMAIL="kyle@kylescudder.co.uk"
+LOG_FILE="/var/log/system_setup.log"
+REPO_DIR="$HOME/Documents/Repos"
+DOTFILES_REPO="https://github.com/kylescudder/dotfiles.git"
 
-# Install git
-echo "Installing git"
-sudo pacman -S --needed git base-devel --noconfirm
-echo "git install completed"
+# Logging functions
+log() {
+    local message="$1"
+    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    echo "[$timestamp] $message" | tee -a "$LOG_FILE"
+}
 
-echo "Configuring git globals"
-git config --global user.name "Kyle Scudder"
-git config --global user.email "kyle@kylescudder.co.uk"
-echo "git globals configured"
+error() {
+    local message="$1"
+    log "ERROR: $message"
+    send_email "Script Error" "An error occurred during system setup: $message"
+    exit 1
+}
 
-# Install hyprland
-echo "Install hyprland"
-sudo pacman -S hyprland --noconfirm
-echo "hyprland install complete"
+send_email() {
+    local subject="$1"
+    local body="$2"
+    if command -v mail > /dev/null; then
+        echo "$body" | mail -s "$subject" "$EMAIL"
+    else
+        log "Warning: mail command not found. Could not send email notification."
+    fi
+}
 
-# Install hyprland-qtutils
-echo "Install hyprland-qtutils"
-yay -S hyprland-qtutils --noconfirm
-echo "hyprland-qtutils install complete"
+# Check if running as root
+check_root() {
+    if [[ $EUID -ne 0 ]]; then
+        error "This script must be run as root"
+    fi
+}
 
-# Install xorg
-echo "Installing xorg"
-sudo pacman -S xorg --noconfirm
-echo "xorg install complete"
+# Install AUR helper (yay)
+install_yay() {
+    log "Installing yay AUR helper..."
+    cd "$HOME"
+    git clone https://aur.archlinux.org/yay.git || error "Failed to clone yay repository"
+    cd yay
+    makepkg -si --noconfirm || error "Failed to install yay"
+    cd "$HOME"
+    rm -rf yay
+    log "yay installation completed"
+}
 
-# Create Documents/Repos
-echo "Create Documents/Repos directory"
-mkdir -p ~/Documents/Repos
-echo "Documents/Repos directory created"
+# System update and base packages
+update_system() {
+    log "Updating system packages..."
+    sudo pacman -Syu --noconfirm || error "System update failed"
+    log "System update completed successfully"
+}
 
-# Clone dotfiles
-echo "Cloning dotfiles repo"
-cd ~/Documents/Repos
-git clone https://github.com/kylescudder/dotfiles.git
-echo "dotfiles repo clone completed"
+# Desktop environment setup
+install_desktop_environment() {
+    log "Installing desktop environment components..."
+    
+    # GNOME
+    sudo pacman -S gnome --noconfirm || error "GNOME installation failed"
+    
+    # Xorg
+    sudo pacman -S xorg --noconfirm || error "Xorg installation failed"
+    
+    # Hyprland and related
+    sudo pacman -S hyprland --noconfirm || error "Hyprland installation failed"
+    yay -S hyprland-qtutils --noconfirm || error "Hyprland-qtutils installation failed"
+    
+    log "Desktop environment installation completed"
+}
 
-# Install 1Password dependencies
-echo "Install 1Password dependencies"
-sudo pacman -S go go-tools xfsprogs apparmor squashfs-tools --noconfirm
-echo "Pacman dependencies install complete"
+# Development tools setup
+install_dev_tools() {
+    log "Installing development tools..."
+    
+    # Git setup
+    sudo pacman -S --needed git base-devel --noconfirm || error "Git installation failed"
+    git config --global user.name "Kyle Scudder"
+    git config --global user.email "$EMAIL"
+    
+    # Node.js and related
+    yay -S nodejs npm --noconfirm || error "Node.js installation failed"
+    
+    # .NET
+    yay -S dotnet-runtime dotnet-sdk aspnet-runtime --noconfirm || error ".NET installation failed"
+    
+    # Editors and tools
+    sudo pacman -S neovim tmux lazygit --noconfirm || error "Development tools installation failed"
+    
+    log "Development tools installation completed"
+}
 
-#Install 1Password
-echo "Installing 1Password"
-cd ~/
-curl -sS https://downloads.1password.com/linux/keys/1password.asc | gpg --import
-git clone https://aur.archlinux.org/1password.git
-cd 1password
-makepkg -si --noconfirm
-echo "1Password install completed"
+# Terminal setup
+setup_terminal() {
+    log "Setting up terminal environment..."
+    
+    # Terminal emulators
+    yay -S kitty ghostty-git --noconfirm || error "Terminal emulators installation failed"
+    
+    # Shell and prompt
+    yay -S zsh starship --noconfirm || error "Shell tools installation failed"
+    chsh -s /usr/bin/zsh || error "Failed to set ZSH as default shell"
+    
+    # TMux plugin manager
+    git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm || error "TMux plugin manager installation failed"
+    
+    log "Terminal setup completed"
+}
 
-# Install snap and snap store
-echo "Installing snap and snap store"
-cd ~/
-git clone https://aur.archlinux.org/snapd.git
-cd snapd
-makepkg -si --noconfirm
-sudo ln -s /var/lib/snapd/snap /snap
-echo "snap and snap store install completed"
+# Application installation
+install_applications() {
+    log "Installing applications..."
+    
+    # System utilities
+    yay -S stow fastfetch picom feh hyprshot nvidia-open linux-headers yazi --noconfirm || error "System utilities installation failed"
+    
+    # Desktop applications
+    sudo pacman -S vlc --noconfirm || error "VLC installation failed"
+    
+    # Wayland specific
+    yay -S rofi-wayland waybar swaync hyprlock hypridle hyprpaper --noconfirm || error "Wayland tools installation failed"
+    
+    # Fonts
+    sudo pacman -S ttf-font-awesome --noconfirm || error "Font awesome installation failed"
+    yay -S ttf-meslo-nerd --noconfirm || error "Nerd fonts installation failed"
+    
+    # Music
+    yay -S spotifyd spotify-launcher spicetify-cli --noconfirm || error "Music applications installation failed"
+    
+    # Zen Browser
+    log "Installing Zen browser..."
+    sudo mkdir -p /opt/zen-browser-bin || error "Failed to create Zen browser directory"
+    sudo sh -c 'curl -L "https://github.com/zen-browser/desktop/releases/latest/download/zen.linux-x86_64.tar.bz2" | tar xj -C /opt/zen-browser-bin --strip-components=1' || error "Failed to install Zen browser"
+    
+    log "Applications installation completed"
+}
 
-# Install yay
-echo "Installing yay for AUR package management"
-cd ~/
-git clone https://aur.archlinux.org/yay.git
-cd yay
-makepkg -si --noconfirm
-echo "yay install completed"
+# 1Password setup
+install_1password() {
+    log "Installing 1Password..."
+    
+    # Dependencies
+    sudo pacman -S go go-tools xfsprogs apparmor squashfs-tools --noconfirm || error "1Password dependencies installation failed"
+    
+    # Installation
+    cd "$HOME"
+    curl -sS https://downloads.1password.com/linux/keys/1password.asc | gpg --import
+    git clone https://aur.archlinux.org/1password.git
+    cd 1password
+    makepkg -si --noconfirm || error "1Password installation failed"
+    
+    log "1Password installation completed"
+}
 
-# Install packages
-echo "Installing stow"
-yay -S stow --noconfirm
-echo "stow install completed"
+# Dotfiles setup
+setup_dotfiles() {
+    log "Setting up dotfiles..."
+    
+    mkdir -p "$REPO_DIR"
+    cd "$REPO_DIR"
+    git clone "$DOTFILES_REPO" || error "Dotfiles clone failed"
+    
+    cd ~/Documents/Repos/dotfiles/
+    
+    # Remove existing configs
+    rm -f ~/.config/hypr/hyprland.conf
+    rm -f ~/.bashrc
+    
+    # Create symlinks
+    local stow_targets=(
+        "hyprland" "waybar" "kitty" "nvim" "spotifyd" "starship"
+        "bashrc" "tmux" "zsh" "applications" "icons" "wallpapers"
+        "shmux" "fastfetch" "rofi" "yazi"
+    )
+    
+    for target in "${stow_targets[@]}"; do
+        stow "$target" -t ~/ || error "Failed to stow $target"
+    done
+    
+    stow applications icons wallpapers -t "$HOME/.local/share" || error "Failed to stow shared resources"
+    
+    log "Dotfiles setup completed"
+}
 
-echo "Installing stow"
-yay -S stow --noconfirm
-echo "stow install completed"
+# Snap setup
+setup_snap() {
+    log "Setting up Snap..."
+    
+    cd "$HOME"
+    git clone https://aur.archlinux.org/snapd.git
+    cd snapd
+    makepkg -si --noconfirm || error "Snap installation failed"
+    
+    sudo ln -s /var/lib/snapd/snap /snap
+    sudo systemctl enable --now snapd.socket
+    sudo systemctl enable --now snapd.apparmor.service
+    
+    # Install Obsidian
+    sudo snap install obsidian --classic || error "Obsidian installation failed"
+    
+    log "Snap setup completed"
+}
 
-echo "Installing nvim"
-sudo pacman -S neovim --noconfirm
-echo "nvim install completed"
+# Main execution
+main() {
+    log "Starting system setup..."
+    
+    # Create log file
+    sudo touch "$LOG_FILE"
+    sudo chown "$USER:$USER" "$LOG_FILE"
+    
+    update_system
+    install_yay
+    install_desktop_environment
+    install_dev_tools
+    setup_terminal
+    install_applications
+    install_1password
+    setup_dotfiles
+    setup_snap
+    
+    # Enable display manager
+    sudo systemctl enable gdm.service || error "Failed to enable GDM"
+    
+    log "System setup completed successfully"
+    send_email "System Setup Complete" "The system setup script has completed successfully. Check $LOG_FILE for details."
+}
 
-echo "Installing tmux"
-sudo pacman -S tmux --noconfirm
-echo "tmux install completed"
+# Trap errors
+trap 'error "An error occurred on line $LINENO. Check the logs for details."' ERR
 
-# Installing tmux plugin manager
-echo "Installing tpm"
-git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
-echo "tpm install comepleted"
-
-# Installing lazygit 
-echo "Installing lazygit"
-sudo pacman -S lazygit --noconfirm
-echo "lazygit install comepleted"
-
-# Installing fastfetch
-echo "Installing fastfetch" 
-sudo pacman -S fastfetch --noconfirm
-echo "fastfetch install completed"
-
-# Installing nodejs
-echo "Installing nodejs" 
-yay -S nodejs --noconfirm
-echo "nodejs install completed"
-
-# Installing npm 
-echo "Installing npm" 
-yay -Snpm --noconfirm
-echo "npm install completed"
-
-echo "Installing starship"
-yay -S starship --noconfirm
-echo "starship install completed"
-
-echo "Installing kitty"
-yay -S kitty --noconfirm
-echo "kitty install completed"
-
-# Installed ghostty
-echo "Installing ghostty"
-yay -S ghostty-git --noconfirm
-echo "ghostty install completed"
-
-echo "Installing picom"
-yay -S picom  --noconfirm
-echo "picom install completed"
-
-echo "Installing feh"
-yay -S feh --noconfirm
-echo "feh install completed"
-
-echo "Installing hyprshot"
-yay -S hyprshot  --noconfirm
-echo "hyprshot install complete"
-
-echo "Installing nvidia-open"
-yay -S nvidia-open  --noconfirm
-echo "nvidia-open install complete"
-
-echo "Installing VLC"
-sudo pacman -S vlc  --noconfirm
-echo "VLC install complete"
-
-echo "Installing rofi-wayland"
-yay -S rofi-wayland  --noconfirm
-echo "rofi-wayland install complete"
-
-echo "Installing linux-headers"
-sodu pacman -S linux-headers  --noconfirm
-echo "linux-headers install complete"
-
-echo "Installing waybar"
-sudo pacman -S waybar  --noconfirm
-echo "waybar install complete"
-
-echo "Installing ttf-font-awesome"
-sudo pacman -S ttf-font-awesome  --noconfirm
-echo "ttf-font-awesome install complete"
-
-echo "Installing swaync"
-sudo pacman -S swaync  --noconfirm
-echo "swaync install complete"
-
-echo "Installing hyprlock"
-yay -S hyprlock  --noconfirm
-echo "hyprlock install complete"
-
-echo "Installing hypridle"
-yay -S hypridle  --noconfirm
-echo "hypridle install complete"
-
-echo "Installing hyprpaper"
-yay -S hyprpaper  --noconfirm
-echo "hyprpaper install complete"
-
-echo "Installing spotifyd"
-yay -S spotifyd  --noconfirm
-echo "spotifyd install completed"
-
-echo "Installing spotify-launcher"
-yay -S spotify-launcher --noconfirm
-echo "spotify-launcher install complete"
-
-echo "Installing spicetify"
-yay -S spicetify-cli --noconfirm
-echo "Spicetify install complete"
-
-echo "Installing zen"
-sudo mkdir -p /opt/zen-browser-bin && sudo sh -c 'curl -L "https://github.com/zen-browser/desktop/releases/latest/download/zen.linux-x86_64.tar.bz2" | tar xj -C /opt/zen-browser-bin --strip-components=1'
-echo "zen install completed"
-
-echo "Installing nerd fonts"
-yay -S ttf-meslo-nerd --noconfirm
-echo "ttf meslo nerd install completed"
-
-echo "Installing dotnet-runtime"
-yay -S dotnet-runtime --noconfirm
-echo "dotnet-runtime install completed"
-
-echo "Installing dotnet-sdk"
-yay -S dotnet-sdk --noconfirm
-echo "dotnet-sdk install completed"
-
-echo "Installing aspnet-runtime"
-yay -S aspnet-runtime --noconfirm
-echo "aspnet-runtime install completed"
-
-echo "Installing yazi"
-yay -S yazi --noconfirm
-echo "yazi install completed"
-
-# Installing zsh
-echo "Installing zsh"
-yay -S zsh --noconfirm
-chsh -s /usr/bin/zsh
-echo "zsh install completed"
-
-# Create symlinks
-echo "Creating symlinks for dotfiles"
-cd ~/Documents/Repos/dotfiles/
-rm -f ~/.config/hypr/hyprland.conf
-stow hyprland -t ~/
-stow waybar -t ~/
-stow kitty -t ~/
-stow nvim -t ~/
-stow spotifyd -t ~/
-stow starship -t ~/
-rm -f ~/.bashrc
-stow bashrc -t ~/
-stow tmux -t ~/
-stow zsh -t ~/
-stow applications -t $HOME/.local/share
-stow icons -t $HOME/.local/share
-stow wallpapers -t $HOME/.local/share
-stow shmux -t ~/
-stow fastfetch -t ~/
-stow rofi -t ~/
-stow yazi -t ~/
-
-# Enable snap
-echo "Enable snap"
-sudo systemctl enable --now snapd.socket
-sudo systemctl enable --now snapd.apparmor.service
-echo "Snap enabled"
-
-# Install Obsidian
-echo "Installing obsidian"
-sudo snap install obsidian --classic
-echo "Obsidian install completed"
-
-# Enable GNOME Display Manager (GDM) and other services
-echo "Enabling GDM and services..."
-sudo systemctl enable gdm.service
-echo "GNOME installation and setup complete."
+# Run main function
+main "$@"
