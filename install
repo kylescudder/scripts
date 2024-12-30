@@ -257,7 +257,3 @@ echo "Obsidian install completed"
 echo "Enabling GDM and services..."
 sudo systemctl enable gdm.service
 echo "GNOME installation and setup complete."
-
-# Reboot machine to restart any services
-echo "Rebooting machine"
-reboot
