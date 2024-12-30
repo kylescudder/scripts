@@ -94,7 +94,12 @@ echo "Installing tpm"
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 echo "tpm install comepleted"
 
+# Installing lazygit 
+echo "Installing lazygit"
+sudo pacman -S lazygit --noconfirm
+echo "lazygit install comepleted"
 
+# Installing fastfetch
 echo "Installing fastfetch" 
 sudo pacman -S fastfetch --noconfirm
 echo "fastfetch install completed"
