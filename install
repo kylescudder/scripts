@@ -21,7 +21,7 @@ echo "git install completed"
 
 # Install hyprland
 echo "Install hyprland"
-sudo pacman -S hyprland
+sudo pacman -S hyprland --noconfirm
 echo "hyprland install complete"
 
 # Install xorg
