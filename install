@@ -94,10 +94,6 @@ echo "Installing tpm"
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 echo "tpm install comepleted"
 
-# Installing shmux tmux session manager 
-echo "Installing shmux"
-git clone https://github.com/typercraft-dev/shmux.git $HOME/.config/shmux
-echo "shmux install comepleted"
 
 echo "Installing fastfetch" 
 sudo pacman -S fastfetch --noconfirm
