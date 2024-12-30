@@ -67,7 +67,6 @@ echo "Install 1Password dependencies"
 sudo pacman -S go go-tools xfsprogs apparmor squashfs-tools --noconfirm
 echo "Pacman dependencies install complete"
 
-#
 #Install 1Password
 echo "Installing 1Password"
 cd ~/
