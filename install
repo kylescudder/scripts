@@ -115,6 +115,27 @@ setup_terminal() {
     log "Terminal setup completed"
 }
 
+# GRUB theme setup
+setup_grub_theme() {
+    log "Setting up Catppuccin GRUB theme..."
+    
+    cd "$HOME"
+    git clone https://github.com/catppuccin/grub.git || error "Failed to clone GRUB theme"
+    cd grub
+    
+    sudo cp -r src/* /usr/share/grub/themes/ || error "Failed to copy GRUB themes"
+    
+    # Update GRUB configuration
+    sudo sed -i 's|^GRUB_THEME=.*|GRUB_THEME="/usr/share/grub/themes/catppuccin-mocha-grub-theme\/theme.txt"|' /etc/default/grub
+    # Update GRUB
+    sudo grub-mkconfig -o /boot/grub/grub.cfg || error "Failed to update GRUB configuration"
+    
+    cd "$HOME"
+    rm -rf grub
+    
+    log "GRUB theme setup completed"
+}
+
 # Cura installation
 install_cura() {
     log "Installing Cura..."
@@ -257,6 +278,7 @@ main() {
     setup_dotfiles
     setup_snap
     install_cura
+    setup_grub_theme
     
     # Enable display manager
     sudo systemctl enable gdm.service || error "Failed to enable GDM"
