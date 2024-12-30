@@ -221,6 +221,12 @@ echo "Installing yazi"
 yay -S yazi --noconfirm
 echo "yazi install completed"
 
+# Installing zsh
+echo "Installing zsh"
+yay -S zsh --noconfirm
+chsh -s /usr/bin/zsh
+echo "zsh install completed"
+
 # Enable snap
 echo "Enable snap"
 sudo systemctl enable --now snapd.socket
