@@ -40,24 +40,6 @@ cd ~/Documents/Repos
 git clone https://github.com/kylescudder/dotfiles.git
 echo "dotfiles repo clone completed"
 
-# Create symlinks
-echo "Creating symlinks for dotfiles"
-cd ~/.config
-stow hyprland -t ~/
-stow waybar -t ~/
-stow kitty -t ~/
-stow nvim -t ~/
-stow spotifyd -t ~/
-stow starship -t ~/
-stow bashrc -t ~/
-stow tmux -t ~/
-stow zsh -t ~/
-stow applications -t $HOME/.local/share
-stow icons -t $HOME/.local/share
-stow fastfetch -t ~/
-stow rofi -t ~/
-stow yazi -t ~/
-
 cd ~/
 mkdir -p /home/kyle/.config/backgrounds
 cp ~/Documents/Repos/dotfiles/feh/catppuccin-background.png /home/kyle/.config/backgrounds/catppuccin-background.png
@@ -226,6 +208,27 @@ echo "Installing zsh"
 yay -S zsh --noconfirm
 chsh -s /usr/bin/zsh
 echo "zsh install completed"
+
+# Create symlinks
+echo "Creating symlinks for dotfiles"
+cd ~/Documents/Repos/dotfiles/
+rm -f ~/.config/hypr/hyprland.conf
+stow hyprland -t ~/
+stow waybar -t ~/
+stow kitty -t ~/
+stow nvim -t ~/
+stow spotifyd -t ~/
+stow starship -t ~/
+rm -f ~/.bashrc
+stow bashrc -t ~/
+stow tmux -t ~/
+stow zsh -t ~/
+stow applications -t $HOME/.local/share
+stow icons -t $HOME/.local/share
+stow shmux -t ~/
+stow fastfetch -t ~/
+stow rofi -t ~/
+stow yazi -t ~/
 
 # Enable snap
 echo "Enable snap"
