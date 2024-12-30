@@ -114,6 +114,26 @@ setup_terminal() {
     log "Terminal setup completed"
 }
 
+# Cura installation
+install_cura() {
+    log "Installing Cura..."
+    
+    # Install FUSE dependency
+    sudo pacman -S fuse --noconfirm || error "FUSE installation failed"
+    
+    # Create directory for AppImage
+    mkdir -p "$HOME/.local/share/AppImages" || error "Failed to create AppImage directory"
+    
+    # Download latest Cura
+    curl -L "https://github.com/Ultimaker/Cura/releases/download/5.9.0/UltiMaker-Cura-5.9.0-linux-X64.AppImage" \
+        -o "$HOME/.local/share/AppImage/Cura.AppImage" || error "Failed to download Cura"
+    
+    # Make AppImage executable
+    chmod +x "$HOME/.local/share/AppImage/Cura.AppImage" || error "Failed to make Cura executable"
+    
+    log "Cura installation completed"
+}
+
 # Application installation
 install_applications() {
     log "Installing applications..."
@@ -225,6 +245,7 @@ main() {
     install_1password
     setup_dotfiles
     setup_snap
+    install_cura
     
     # Enable display manager
     sudo systemctl enable gdm.service || error "Failed to enable GDM"
