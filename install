@@ -93,7 +93,7 @@ install_dev_tools() {
     yay -S dotnet-runtime dotnet-sdk aspnet-runtime --noconfirm || error ".NET installation failed"
     
     # Editors and tools
-    sudo pacman -S neovim tmux lazygit --noconfirm || error "Development tools installation failed"
+    sudo pacman -S neovim tmux lazygit python --noconfirm || error "Development tools installation failed"
     
     log "Development tools installation completed"
 }
