@@ -24,6 +24,11 @@ echo "Install hyprland"
 sudo pacman -S hyprland --noconfirm
 echo "hyprland install complete"
 
+# Install hyprland-qtutils
+echo "Install hyprland-qtutils"
+yay -S hyprland-qtutils --noconfirm
+echo "hyprland-qtutils install complete"
+
 # Install xorg
 echo "Installing xorg"
 sudo pacman -S xorg --noconfirm
