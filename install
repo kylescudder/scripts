@@ -8,6 +8,7 @@ EMAIL="kyle@kylescudder.co.uk"
 LOG_FILE="/var/log/system_setup.log"
 REPO_DIR="$HOME/Documents/Repos"
 DOTFILES_REPO="https://github.com/kylescudder/dotfiles.git"
+SCRIPTS_REPO="https://github.com/kylescudder/scripts.git"
 
 # Logging functions
 log() {
@@ -188,7 +189,7 @@ setup_dotfiles() {
     git clone "$DOTFILES_REPO" || error "Dotfiles clone failed"
     
     cd ~/Documents/Repos/dotfiles/
-    
+
     # Remove existing configs
     rm -f ~/.config/hypr/hyprland.conf
     rm -f ~/.bashrc
@@ -206,6 +207,15 @@ setup_dotfiles() {
     
     stow applications icons wallpapers -t "$HOME/.local/share" || error "Failed to stow shared resources"
     
+
+    log "Setting up scripts"
+    git clone "$SCRIPTS_REPO" || error "scripts clone failed"
+    
+    cd ~/Documents/Repos/scripts/
+
+    chmod +x songdetails
+    log "scripts setup completed"
+
     log "Dotfiles setup completed"
 }
 
