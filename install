@@ -98,6 +98,16 @@ echo "Installing fastfetch"
 sudo pacman -S fastfetch --noconfirm
 echo "fastfetch install completed"
 
+# Installing nodejs
+echo "Installing nodejs" 
+yay -S nodejs --noconfirm
+echo "nodejs install completed"
+
+# Installing npm 
+echo "Installing npm" 
+yay -Snpm --noconfirm
+echo "npm install completed"
+
 echo "Installing starship"
 yay -S starship --noconfirm
 echo "starship install completed"
