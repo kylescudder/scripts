@@ -122,6 +122,11 @@ echo "Installing kitty"
 yay -S kitty --noconfirm
 echo "kitty install completed"
 
+# Installed ghostty
+echo "Installing ghostty"
+yay -S ghostty-git --noconfirm
+echo "ghostty install completed"
+
 echo "Installing picom"
 yay -S picom  --noconfirm
 echo "picom install completed"
