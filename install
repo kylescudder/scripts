@@ -229,7 +229,7 @@ echo "Snap enabled"
 
 # Install Obsidian
 echo "Installing obsidian"
-sudo snap install obsidian --classic --noconfirm
+sudo snap install obsidian --classic
 echo "Obsidian install completed"
 
 # Enable GNOME Display Manager (GDM) and other services
