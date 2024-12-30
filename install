@@ -186,7 +186,7 @@ yay -S spicetify-cli --noconfirm
 echo "Spicetify install complete"
 
 echo "Installing zen"
-yay -S zen-browser-bin --noconfirm
+sudo mkdir -p /opt/zen-browser-bin && sudo sh -c 'curl -L "https://github.com/zen-browser/desktop/releases/latest/download/zen.linux-x86_64.tar.bz2" | tar xj -C /opt/zen-browser-bin --strip-components=1'
 echo "zen install completed"
 
 echo "Installing nerd fonts"
