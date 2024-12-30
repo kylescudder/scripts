@@ -165,6 +165,7 @@ install_applications() {
     
     # Desktop applications
     sudo pacman -S vlc --noconfirm || error "VLC installation failed"
+    yay -S thunderbird --noconfirm || error "Thunderbird failed"
     
     # Wayland specific
     yay -S rofi-wayland waybar swaync hyprlock hypridle hyprpaper --noconfirm || error "Wayland tools installation failed"
