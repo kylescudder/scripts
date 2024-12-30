@@ -13,6 +13,10 @@ echo "GNOME install complete"
 # Install git
 echo "Installing git"
 sudo pacman -S --needed git base-devel --noconfirm
+echo "Configuring git globals"
+git config --global user.name "Kyle Scudder"
+git config --global user.email "kyle@kylescudder.co.uk"
+echo "git globals configured"
 echo "git install completed"
 
 # Install hyprland
