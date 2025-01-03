@@ -161,7 +161,7 @@ install_applications() {
     log "Installing applications..."
     
     # System utilities
-    yay -S stow fastfetch picom feh hyprshot nvidia-open linux-headers yazi --noconfirm || error "System utilities installation failed"
+    yay -S stow fastfetch picom feh hyprshot nvidia-open linux-headers yazi btop --noconfirm || error "System utilities installation failed"
     
     # Desktop applications
     sudo pacman -S vlc --noconfirm || error "VLC installation failed"
