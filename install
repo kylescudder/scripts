@@ -156,6 +156,23 @@ install_cura() {
     log "Cura installation completed"
 }
 
+# xone installation
+install_xone() {
+    log "Installing xone for Xbox controller fireware/drivers..."
+    
+    # Clone the repo
+    git clone https://github.com/dlundqvist/xone
+    
+    # Move into directory then run the install script
+    cd xone
+    sudo ./install.sh
+    
+    # Get fireware 
+    sudo xone-get-fireware.sh
+    
+    log "Xone installation completed"
+}
+
 # Application installation
 install_applications() {
     log "Installing applications..."
@@ -285,6 +302,7 @@ main() {
     setup_snap
     install_cura
     setup_grub_theme
+    install_xone
     
     # Enable display manager
     sudo systemctl enable gdm.service || error "Failed to enable GDM"
