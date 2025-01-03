@@ -169,6 +169,10 @@ install_xone() {
     
     # Get fireware 
     sudo xone-get-fireware.sh
+
+    # Clean up
+    cd ../
+    rm -fr xone
     
     log "Xone installation completed"
 }
