@@ -242,7 +242,7 @@ setup_dotfiles() {
     local stow_targets=(
         "hyprland" "waybar" "kitty" "nvim" "spotifyd" "starship"
         "bashrc" "tmux" "zsh" "applications" "icons" "wallpapers"
-        "shmux" "fastfetch" "rofi" "yazi" "ghostty"
+        "shmux" "fastfetch" "rofi" "yazi" "ghostty" "btop"
     )
     
     for target in "${stow_targets[@]}"; do
