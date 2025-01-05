@@ -246,7 +246,7 @@ setup_dotfiles() {
     local stow_targets=(
         "hyprland" "waybar" "kitty" "nvim" "spotifyd" "starship"
         "bashrc" "tmux" "zsh" "applications" "icons" "wallpapers"
-        "shmux" "fastfetch" "rofi" "yazi" "ghostty" "btop"
+        "shmux" "fastfetch" "rofi" "yazi" "ghostty" "btop" "wlogout"
     )
     
     for target in "${stow_targets[@]}"; do
