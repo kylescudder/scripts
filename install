@@ -196,7 +196,7 @@ install_applications() {
     yay -S ttf-meslo-nerd --noconfirm || error "Nerd fonts installation failed"
     
     # Music
-    yay -S spotifyd spotify-launcher spicetify-cli --noconfirm || error "Music applications installation failed"
+    yay -S spotifyd spotify-launcher spicetify-cli pavucontrol --noconfirm || error "Music applications installation failed"
     
     # Zen Browser
     log "Installing Zen browser..."
