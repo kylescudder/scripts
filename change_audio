@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# Check if a device name is provided as an argument
+if [ -z "$1" ]; then
+  echo "Error: No device name provided."
+  echo "Usage: $0 <device_name>"
+  exit 1
+fi
+
+# Device name passed as the first argument
+DEVICE_NAME=$1
+
+# Check if the device exists in the list of sinks
+if pactl list short sinks | grep -q "$DEVICE_NAME"; then
+  # Change the output device
+  pactl set-default-sink "$DEVICE_NAME"
+  echo "Output device switched to: $DEVICE_NAME"
+else
+  echo "Error: Device '$DEVICE_NAME' not found!"
+  exit 1
+fi
+
