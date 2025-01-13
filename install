@@ -186,6 +186,8 @@ install_applications() {
     
     # System utilities
     yay -S stow fastfetch picom feh hyprshot nvidia-open linux-headers yazi btop wlogout --noconfirm || error "System utilities installation failed"
+
+    sudo pacman -S wget --noconfirm || error "System utilities pacman installation failed"
     
     # Desktop applications
     sudo pacman -S vlc --noconfirm || error "VLC installation failed"
