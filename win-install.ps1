@@ -34,7 +34,7 @@ Install-App -Id "Microsoft.SQLServerManagementStudio" -Name "SQL Server Manageme
 # Install-App -Id "SQLShades.SQLShades" -Name "SQL Shades"
 
 # Azure Storage Explorer
-Install-App -Id "Microsoft.StorageExplorer" -Name "Azure Storage Explorer"
+Install-App -Id "Microsoft.Azure.StorageExplorer" -Name "Azure Storage Explorer"
 
 # Postman
 Install-App -Id "Postman.Postman" -Name "Postman"
@@ -44,12 +44,18 @@ Install-App -Id "Warp.Warp" -Name "Warp Terminal"
 
 # Zen Browser
 # Verify the correct Id for Zen Browser from winget's repository.
-Install-App -Id "ZenBrowser.Zen" -Name "Zen Browser"
+Install-App -Id "Zen-Team.Zen-Browser" -Name "Zen Browser"
 
 # Git CLI
 Install-App -Id "Git.Git" -Name "Git CLI"
 
 # 1Password
-Install-App -Id "1Password.1Password" -Name "1Password"
+$url = "https://downloads.1password.com/win/1PasswordSetup-latest.exe"
+$output = "$env:TEMP\1PasswordSetup.exe"
+
+Invoke-WebRequest -Uri $url -OutFile $output -UseBasicParsing
+
+Start-Process -FilePath $output -ArgumentList "/silent", "/verysilent" -Wait -Verb RunAs
+
 
 Write-Host "Installation script completed!" -ForegroundColor Cyan
