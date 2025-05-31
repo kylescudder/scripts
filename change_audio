@@ -1,22 +1,31 @@
 #!/bin/bash
 
-# Check if a device name is provided as an argument
-if [ -z "$1" ]; then
-  echo "Error: No device name provided."
-  echo "Usage: $0 <device_name>"
+# Exit on error, arg errors and detect errors in pipeline
+set -euo pipefail
+
+if [ $# -ne 1 ]; then
+  echo "Usage: $0 <sink-name-or-index>"
   exit 1
 fi
 
-# Device name passed as the first argument
-DEVICE_NAME=$1
+TARGET_SINK="$1"
 
-# Check if the device exists in the list of sinks
-if pactl list short sinks | grep -q "$DEVICE_NAME"; then
-  # Change the output device
-  pactl set-default-sink "$DEVICE_NAME"
-  echo "Output device switched to: $DEVICE_NAME"
-else
-  echo "Error: Device '$DEVICE_NAME' not found!"
-  exit 1
+# Verify the sink exists
+if ! pactl list short sinks | awk '{print $1,$2}' | grep -qE "^${TARGET_SINK}[[:space:]]|[[:space:]]${TARGET_SINK}$"; then
+  echo "Error: sink '${TARGET_SINK}' not found."
+  echo "Available sinks:"
+  pactl list short sinks
+  exit 2
 fi
 
+# Move each playback stream (sink-input) to the target sink
+echo "Moving all playback streams to sink '${TARGET_SINK}'..."
+while read -r INPUT_ID _ ; do
+  echo " · Moving input #${INPUT_ID}…"
+  pactl move-sink-input "${INPUT_ID}" "${TARGET_SINK}"
+done < <(pactl list short sink-inputs)
+
+echo " · Setting default output source to ${TARGET_SINK}"
+pactl set-default-sink "${TARGET_SINK}"
+
+echo "Done."
