@@ -258,7 +258,9 @@ setup_dotfiles() {
         stow "$target" -t ~/ || error "Failed to stow $target"
     done
     
-    stow applications icons wallpapers -t "$HOME/.local/share" || error "Failed to stow shared resources"
+    stow applications -t "$HOME/.local/share/applications" || error "Failed to stow shared resources"
+    stow icons -t "$HOME/.local/share/icons" || error "Failed to stow shared resources"
+    stow wallpapers -t "$HOME/.local/share/wallpapers" || error "Failed to stow shared resources"
     
     stow zen =t "$HOME/.zen/n533tnw4.Default\ \(beta\)" || erorr "Failed to show zen resources"
 
