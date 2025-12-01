@@ -1,0 +1,20 @@
+#!/bin/zsh
+
+SESSIONNAME="CTWorkDay"
+
+tmux has-session -t "$SESSIONNAME" &> /dev/null
+
+if [ $? -ne 0 ]; then
+  # Create session with first window: Jira
+  tmux new-session -d -s "$SESSIONNAME" -n "Jira"
+  tmux send-keys -t "$SESSIONNAME:0" "jiratui ui" C-m
+
+  # Second window: Git
+  tmux new-window -t "$SESSIONNAME" -n "Git"
+  tmux send-keys -t "$SESSIONNAME:1" "lazygit" C-m
+
+  # Third window: misc (empty shell)
+  tmux new-window -t "$SESSIONNAME" -n "any other shit i want to run"
+fi
+
+tmux attach -t "$SESSIONNAME"
