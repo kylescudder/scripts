@@ -1,18 +1,8 @@
 #!/bin/bash
-
-# Switch to optical speakers (IEC958) and move all audio there
-
 set -euo pipefail
 
-CARD_NAME="alsa_card.pci-0000_00_1f.3"
-SINK_NAME="alsa_output.pci-0000_00_1f.3.iec958-stereo"
+SINK_NAME="alsa_output.pci-0000_00_1f.3.pro-output-1"
 CHANGE_AUDIO_SCRIPT="$HOME/Documents/Repos/scripts/change_audio"
 
-echo "Switching ${CARD_NAME} to profile 'output:iec958-stereo'..."
-pactl set-card-profile "${CARD_NAME}" output:iec958-stereo
-
-# Give Pulse a brief moment if needed (usually safe without, but harmless)
-sleep 0.1
-
-echo "Routing all audio to sink '${SINK_NAME}'..."
+echo "Routing to optical (${SINK_NAME})..."
 "${CHANGE_AUDIO_SCRIPT}" "${SINK_NAME}"
