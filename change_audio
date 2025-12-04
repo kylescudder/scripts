@@ -10,22 +10,23 @@ fi
 
 TARGET_SINK="$1"
 
-# Verify the sink exists
-if ! pactl list short sinks | awk '{print $1,$2}' | grep -qE "^${TARGET_SINK}[[:space:]]|[[:space:]]${TARGET_SINK}$"; then
+# Verify the sink exists (match either index or name in columns 1 or 2)
+if ! pactl list short sinks | awk '{print $1, $2}' | grep -qE "^${TARGET_SINK}[[:space:]]|[[:space:]]${TARGET_SINK}$"; then
   echo "Error: sink '${TARGET_SINK}' not found."
   echo "Available sinks:"
   pactl list short sinks
   exit 2
 fi
 
-# Move each playback stream (sink-input) to the target sink
 echo "Moving all playback streams to sink '${TARGET_SINK}'..."
-while read -r INPUT_ID _ ; do
-  echo " · Moving input #${INPUT_ID}…"
+
+# Move each playback stream (sink-input) to the target sink
+while read -r INPUT_ID _; do
+  echo " · Moving input #${INPUT_ID}..."
   pactl move-sink-input "${INPUT_ID}" "${TARGET_SINK}"
 done < <(pactl list short sink-inputs)
 
-echo " · Setting default output source to ${TARGET_SINK}"
+echo " · Setting default output sink to ${TARGET_SINK}"
 pactl set-default-sink "${TARGET_SINK}"
 
 echo "Done."
