@@ -204,9 +204,8 @@ install_applications() {
     yay -S spotifyd spotify-launcher spicetify-cli pavucontrol --noconfirm || error "Music applications installation failed"
     
     # Zen Browser
-    log "Installing Zen browser..."
-    sudo mkdir -p /opt/zen-browser-bin || error "Failed to create Zen browser directory"
-    sudo sh -c 'curl -L "https://github.com/zen-browser/desktop/releases/latest/download/zen.linux-x86_64.tar.bz2" | tar xj -C /opt/zen-browser-bin --strip-components=1' || error "Failed to install Zen browser"
+    log "Installing Helium browser..."
+    yay -S heluim-browser-bin
 
     # SwayNC
     curl -LO "https://github.com/catppuccin/swaync/releases/latest/download/mocha.css"
