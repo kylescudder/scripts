@@ -262,8 +262,6 @@ setup_dotfiles() {
     stow wallpapers -t "$HOME/.local/share/" || error "Failed to stow shared resources"
     sudo stow pixmaps -t "/usr/share/" || error "Failed to stow shared resources"
     
-    stow zen =t "$HOME/.zen/n533tnw4.Default\ \(beta\)" || erorr "Failed to show zen resources"
-
     log "Setting up scripts"
     git clone "$SCRIPTS_REPO" || error "scripts clone failed"
     
