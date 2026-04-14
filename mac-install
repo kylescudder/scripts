@@ -49,7 +49,7 @@ install_formulae() {
     local formulae=(
         git
         stow
-        node
+        fnm
         bun
         neovim
         starship
@@ -59,6 +59,7 @@ install_formulae() {
         lazygit
         jq
         fastfetch
+        spicetify-cli
         dotnet@8
         dotnet@9
         dotnet@10
@@ -89,6 +90,8 @@ install_casks() {
         visual-studio-code
         bruno
         microsoft-azure-storage-explorer
+        helium-browser
+        rider
     )
 
     for cask in "${casks[@]}"; do
@@ -99,11 +102,44 @@ install_casks() {
     log "Applications installation completed"
 }
 
+# Setup fnm and install Node LTS
+setup_fnm() {
+    log "Setting up fnm and Node.js LTS..."
+    eval "$(fnm env --use-on-cd)"
+    fnm install --lts || error "Failed to install Node LTS via fnm"
+    fnm default lts-latest || error "Failed to set fnm default Node version"
+    log "fnm setup completed"
+}
+
 # Install Claude Code CLI
 install_claude_cli() {
     log "Installing Claude Code CLI..."
+    eval "$(fnm env)"
     npm install -g @anthropic-ai/claude-code || error "Claude Code CLI installation failed"
     log "Claude Code CLI installation completed"
+}
+
+# Spicetify setup
+setup_spicetify() {
+    log "Setting up Spicetify..."
+
+    # Grant Spicetify write access to Spotify
+    sudo chmod a+wr /Applications/Spotify.app/Contents/Resources
+    sudo chmod a+wr /Applications/Spotify.app/Contents/MacOS/Spotify
+
+    # Backup and apply initial patch
+    spicetify backup apply || error "Spicetify backup apply failed"
+
+    # Install Catppuccin theme
+    curl -fsSL https://catppuccin.github.io/spicetify/install.sh | sh || error "Catppuccin theme install failed"
+    spicetify config current_theme catppuccin color_scheme mocha || error "Failed to set Spicetify theme"
+
+    # Install Spicetify Marketplace for extensions
+    curl -fsSL https://raw.githubusercontent.com/spicetify/marketplace/main/resources/install.sh | sh || error "Spicetify Marketplace install failed"
+
+    spicetify apply || error "Spicetify apply failed"
+
+    log "Spicetify setup completed"
 }
 
 # Git configuration
@@ -150,9 +186,11 @@ main() {
     install_homebrew
     install_formulae
     install_casks
+    setup_fnm
     install_claude_cli
     setup_git
     setup_dotfiles
+    setup_spicetify
 
     log "Mac setup completed successfully!"
 }
