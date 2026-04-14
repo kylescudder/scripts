@@ -1,0 +1,152 @@
+#!/usr/bin/env bash
+
+# Set strict error handling
+set -euo pipefail
+
+# Configuration
+EMAIL="kyle@kylescudder.co.uk"
+LOG_FILE="$HOME/mac_setup.log"
+REPO_DIR="$HOME/Documents/Repos"
+DOTFILES_REPO="https://github.com/kylescudder/dotfiles.git"
+SCRIPTS_REPO="https://github.com/kylescudder/scripts.git"
+
+# Logging functions
+log() {
+    local message="$1"
+    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    echo "[$timestamp] $message" | tee -a "$LOG_FILE"
+}
+
+error() {
+    local message="$1"
+    log "ERROR: $message"
+    exit 1
+}
+
+# Install Homebrew if not present
+install_homebrew() {
+    if command -v brew &> /dev/null; then
+        log "Homebrew already installed, updating..."
+        brew update || error "Homebrew update failed"
+    else
+        log "Installing Homebrew..."
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" || error "Homebrew installation failed"
+
+        # Add Homebrew to PATH for Apple Silicon
+        if [[ $(uname -m) == "arm64" ]]; then
+            echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> "$HOME/.zprofile"
+            eval "$(/opt/homebrew/bin/brew shellenv)"
+        fi
+
+        log "Homebrew installation completed"
+    fi
+}
+
+# Install CLI tools via brew formulae
+install_formulae() {
+    log "Installing CLI tools..."
+
+    local formulae=(
+        git
+        stow
+        node
+        dotnet@8
+        dotnet@9
+        dotnet@10
+    )
+
+    for formula in "${formulae[@]}"; do
+        log "Installing $formula..."
+        brew install "$formula" || error "Failed to install $formula"
+    done
+
+    log "CLI tools installation completed"
+}
+
+# Install GUI applications via brew casks
+install_casks() {
+    log "Installing applications..."
+
+    local casks=(
+        raycast
+        obsidian
+        spotify
+        1password
+        kitty
+        docker
+        shottr
+        rectangle
+        jordanbaird-ice
+    )
+
+    for cask in "${casks[@]}"; do
+        log "Installing $cask..."
+        brew install --cask "$cask" || error "Failed to install $cask"
+    done
+
+    log "Applications installation completed"
+}
+
+# Install Claude Code CLI
+install_claude_cli() {
+    log "Installing Claude Code CLI..."
+    npm install -g @anthropic-ai/claude-code || error "Claude Code CLI installation failed"
+    log "Claude Code CLI installation completed"
+}
+
+# Git configuration
+setup_git() {
+    log "Configuring git..."
+    git config --global user.name "Kyle Scudder"
+    git config --global user.email "$EMAIL"
+    log "Git configuration completed"
+}
+
+# Dotfiles setup
+setup_dotfiles() {
+    log "Setting up dotfiles..."
+
+    mkdir -p "$REPO_DIR"
+    cd "$REPO_DIR"
+    git clone "$DOTFILES_REPO" || error "Dotfiles clone failed"
+
+    cd "$REPO_DIR/dotfiles"
+
+    local stow_targets=(
+        "kitty" "nvim" "spotifyd" "starship"
+        "tmux" "zsh" "fastfetch" "yazi" "ghostty" "btop"
+    )
+
+    for target in "${stow_targets[@]}"; do
+        stow "$target" -t ~/ || error "Failed to stow $target"
+    done
+
+    log "Dotfiles setup completed"
+
+    log "Setting up scripts..."
+    cd "$REPO_DIR"
+    git clone "$SCRIPTS_REPO" || error "Scripts clone failed"
+    log "Scripts setup completed"
+}
+
+# Main execution
+main() {
+    log "Starting Mac setup..."
+
+    touch "$LOG_FILE"
+
+    install_homebrew
+    install_formulae
+    install_casks
+    install_claude_cli
+    setup_git
+    setup_dotfiles
+
+    log "Mac setup completed successfully!"
+}
+
+# Trap errors
+trap 'error "An error occurred on line $LINENO. Check $LOG_FILE for details."' ERR
+
+# Run main function
+main "$@"
