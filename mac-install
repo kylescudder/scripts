@@ -50,6 +50,15 @@ install_formulae() {
         git
         stow
         node
+        bun
+        neovim
+        starship
+        tmux
+        fzf
+        ripgrep
+        lazygit
+        jq
+        fastfetch
         dotnet@8
         dotnet@9
         dotnet@10
@@ -77,6 +86,9 @@ install_casks() {
         shottr
         rectangle
         jordanbaird-ice
+        visual-studio-code
+        bruno
+        microsoft-azure-storage-explorer
     )
 
     for cask in "${casks[@]}"; do
@@ -114,7 +126,7 @@ setup_dotfiles() {
 
     local stow_targets=(
         "kitty" "nvim" "spotifyd" "starship"
-        "tmux" "zsh" "fastfetch" "yazi" "ghostty" "btop"
+        "tmux" "zsh" "fastfetch" "yazi" "ghostty" "btop" "lazygit"
     )
 
     for target in "${stow_targets[@]}"; do
