@@ -49,7 +49,7 @@ install_formulae() {
     local formulae=(
         git
         stow
-        fnm
+        node
         bun
         neovim
         starship
@@ -102,19 +102,9 @@ install_casks() {
     log "Applications installation completed"
 }
 
-# Setup fnm and install Node LTS
-setup_fnm() {
-    log "Setting up fnm and Node.js LTS..."
-    eval "$(fnm env --use-on-cd)"
-    fnm install --lts || error "Failed to install Node LTS via fnm"
-    fnm default lts-latest || error "Failed to set fnm default Node version"
-    log "fnm setup completed"
-}
-
 # Install Claude Code CLI
 install_claude_cli() {
     log "Installing Claude Code CLI..."
-    eval "$(fnm env)"
     npm install -g @anthropic-ai/claude-code || error "Claude Code CLI installation failed"
     log "Claude Code CLI installation completed"
 }
@@ -186,7 +176,6 @@ main() {
     install_homebrew
     install_formulae
     install_casks
-    setup_fnm
     install_claude_cli
     setup_git
     setup_dotfiles
