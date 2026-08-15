@@ -216,7 +216,7 @@ install_applications() {
     sudo pacman -S wget --noconfirm || error "System utilities pacman installation failed"
     
     # Desktop applications
-    sudo pacman -S vlc --noconfirm || error "VLC installation failed"
+    sudo pacman -S vlc obsidian --noconfirm || error "Desktop applications installation failed"
     paru -S thunderbird --noconfirm || error "Thunderbird failed"
     
     # Wayland specific
@@ -297,22 +297,6 @@ setup_dotfiles() {
     log "Dotfiles setup completed"
 }
 
-# Snap setup
-setup_snap() {
-    log "Setting up Snap..."
-    
-    paru -S snapd --noconfirm || error "Snap installation failed"
-    
-    sudo ln -s /var/lib/snapd/snap /snap
-    sudo systemctl enable --now snapd.socket
-    sudo systemctl enable --now snapd.apparmor.service
-    
-    # Install Obsidian
-    sudo snap install obsidian --classic || error "Obsidian installation failed"
-    
-    log "Snap setup completed"
-}
-
 # Main execution
 main() {
     log "Starting system setup..."
@@ -329,7 +313,6 @@ main() {
     install_applications
     install_1password
     setup_dotfiles
-    setup_snap
     install_cura
     setup_grub_theme
     install_xone
