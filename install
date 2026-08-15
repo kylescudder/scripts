@@ -738,6 +738,6 @@ main() {
         "The system setup script has completed successfully. Check $LOG_FILE for details."
 }
 
-if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+if [[ -z "${BASH_SOURCE[0]-}" || "${BASH_SOURCE[0]}" == "$0" ]]; then
     main "$@"
 fi
