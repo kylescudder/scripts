@@ -558,7 +558,7 @@ install_applications() {
 
     if [[ ! -f "$swaync_theme" ]]; then
         curl -fL \
-            "https://github.com/catppuccin/swaync/releases/latest/download/mocha.css" \
+            "https://github.com/catppuccin/swaync/releases/latest/download/catppuccin-mocha.css" \
             -o "$swaync_theme" \
             || error "Failed to install SwayNC theme"
     else
