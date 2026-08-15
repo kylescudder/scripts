@@ -9,6 +9,7 @@ LOG_FILE="/var/log/system_setup.log"
 REPO_DIR="$HOME/Documents/Repos"
 DOTFILES_REPO="https://github.com/kylescudder/dotfiles.git"
 SCRIPTS_REPO="https://github.com/kylescudder/scripts.git"
+HERDR_REPO="https://github.com/kylescudder/herdr"
 
 # Logging functions
 log() {
@@ -41,16 +42,16 @@ check_root() {
     fi
 }
 
-# Install AUR helper (yay)
-install_yay() {
-    log "Installing yay AUR helper..."
+# Install AUR helper (paru)
+install_paru() {
+    log "Installing paru AUR helper..."
     cd "$HOME"
-    git clone https://aur.archlinux.org/yay.git || error "Failed to clone yay repository"
-    cd yay
-    makepkg -si --noconfirm || error "Failed to install yay"
+    git clone https://aur.archlinux.org/paru.git || error "Failed to clone paru repository"
+    cd paru
+    makepkg -si --noconfirm || error "Failed to install paru"
     cd "$HOME"
-    rm -rf yay
-    log "yay installation completed"
+    rm -rf paru
+    log "paru installation completed"
 }
 
 # System update and base packages
@@ -67,12 +68,9 @@ install_desktop_environment() {
     # GNOME
     sudo pacman -S gnome --noconfirm || error "GNOME installation failed"
     
-    # Xorg
-    sudo pacman -S xorg --noconfirm || error "Xorg installation failed"
-    
     # Hyprland and related
     sudo pacman -S hyprland --noconfirm || error "Hyprland installation failed"
-    yay -S hyprland-qtutils --noconfirm || error "Hyprland-qtutils installation failed"
+    paru -S hyprland-qtutils --noconfirm || error "Hyprland-qtutils installation failed"
     
     log "Desktop environment installation completed"
 }
@@ -87,30 +85,58 @@ install_dev_tools() {
     git config --global user.email "$EMAIL"
     
     # Node.js and related
-    yay -S nodejs npm --noconfirm || error "Node.js installation failed"
+    paru -S nodejs npm --noconfirm || error "Node.js installation failed"
     
     # .NET
-    yay -S dotnet-runtime dotnet-sdk aspnet-runtime --noconfirm || error ".NET installation failed"
+    paru -S dotnet-runtime dotnet-sdk aspnet-runtime --noconfirm || error ".NET installation failed"
     
     # Editors and tools
-    sudo pacman -S neovim tmux lazygit python python-pip fzf --noconfirm || error "Development tools installation failed"
+    sudo pacman -S neovim lazygit python python-pip fzf --noconfirm || error "Development tools installation failed"
     
     log "Development tools installation completed"
+}
+
+install_herdr() {
+    log "Installing Herdr from $HERDR_REPO..."
+
+    local architecture
+    local release_asset
+    local download_dir
+    architecture=$(uname -m)
+
+    case "$architecture" in
+        x86_64)
+            release_asset="herdr-linux-x86_64"
+            ;;
+        aarch64|arm64)
+            release_asset="herdr-linux-aarch64"
+            ;;
+        *)
+            error "Herdr does not provide a Linux release for $architecture"
+            ;;
+    esac
+
+    download_dir=$(mktemp -d) || error "Failed to create Herdr download directory"
+    curl -fL "$HERDR_REPO/releases/latest/download/$release_asset" \
+        -o "$download_dir/herdr" || error "Failed to download Herdr"
+    sudo install -Dm755 "$download_dir/herdr" /usr/local/bin/herdr || error "Failed to install Herdr"
+    rm -rf "$download_dir"
+
+    log "Herdr installation completed"
 }
 
 # Terminal setup
 setup_terminal() {
     log "Setting up terminal environment..."
     
-    # Terminal emulators
-    yay -S kitty ghostty-git --noconfirm || error "Terminal emulators installation failed"
+    # Terminal emulator
+    paru -S ghostty-git --noconfirm || error "Ghostty installation failed"
     
     # Shell and prompt
-    yay -S zsh starship --noconfirm || error "Shell tools installation failed"
+    paru -S zsh starship --noconfirm || error "Shell tools installation failed"
     chsh -s /usr/bin/zsh || error "Failed to set ZSH as default shell"
-    
-    # TMux plugin manager
-    git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm || error "TMux plugin manager installation failed"
+
+    install_herdr
 
     # Bun
     curl -fsSL https://bun.sh/install | bash
@@ -185,27 +211,27 @@ install_applications() {
     log "Installing applications..."
     
     # System utilities
-    yay -S stow fastfetch picom feh hyprshot nvidia-open linux-headers yazi btop wlogout --noconfirm || error "System utilities installation failed"
+    paru -S stow fastfetch picom feh hyprshot nvidia-open linux-headers yazi btop wlogout --noconfirm || error "System utilities installation failed"
 
     sudo pacman -S wget --noconfirm || error "System utilities pacman installation failed"
     
     # Desktop applications
-    sudo pacman -S vlc --noconfirm || error "VLC installation failed"
-    yay -S thunderbird --noconfirm || error "Thunderbird failed"
+    sudo pacman -S vlc obsidian --noconfirm || error "Desktop applications installation failed"
+    paru -S thunderbird --noconfirm || error "Thunderbird failed"
     
     # Wayland specific
-    yay -S rofi-wayland waybar swaync hyprlock hypridle hyprpaper --noconfirm || error "Wayland tools installation failed"
+    paru -S rofi-wayland waybar swaync hyprlock hypridle hyprpaper --noconfirm || error "Wayland tools installation failed"
     
     # Fonts
     sudo pacman -S ttf-font-awesome --noconfirm || error "Font awesome installation failed"
-    yay -S ttf-meslo-nerd --noconfirm || error "Nerd fonts installation failed"
+    paru -S ttf-meslo-nerd --noconfirm || error "Nerd fonts installation failed"
     
     # Music
-    yay -S spotifyd spotify-launcher spicetify-cli pavucontrol --noconfirm || error "Music applications installation failed"
+    paru -S spotifyd spotify-launcher spicetify-cli pavucontrol --noconfirm || error "Music applications installation failed"
     
     # Zen Browser
     log "Installing Helium browser..."
-    yay -S heluim-browser-bin
+    paru -S heluim-browser-bin
 
     # SwayNC
     curl -LO "https://github.com/catppuccin/swaync/releases/latest/download/mocha.css"
@@ -225,9 +251,7 @@ install_1password() {
     # Installation
     cd "$HOME"
     curl -sS https://downloads.1password.com/linux/keys/1password.asc | gpg --import
-    git clone https://aur.archlinux.org/1password.git
-    cd 1password
-    makepkg -si --noconfirm || error "1Password installation failed"
+    paru -S 1password --noconfirm || error "1Password installation failed"
     
     log "1Password installation completed"
 }
@@ -248,8 +272,8 @@ setup_dotfiles() {
     
     # Create symlinks
     local stow_targets=(
-        "hyprland" "waybar" "kitty" "nvim" "spotifyd" "starship"
-        "bashrc" "tmux" "zsh" "applications" "icons" "wallpapers"
+        "hyprland" "waybar" "nvim" "spotifyd" "starship"
+        "bashrc" "zsh" "applications" "icons" "wallpapers"
         "shmux" "fastfetch" "rofi" "yazi" "ghostty" "btop" "wlogout"
     )
     
@@ -273,25 +297,6 @@ setup_dotfiles() {
     log "Dotfiles setup completed"
 }
 
-# Snap setup
-setup_snap() {
-    log "Setting up Snap..."
-    
-    cd "$HOME"
-    git clone https://aur.archlinux.org/snapd.git
-    cd snapd
-    makepkg -si --noconfirm || error "Snap installation failed"
-    
-    sudo ln -s /var/lib/snapd/snap /snap
-    sudo systemctl enable --now snapd.socket
-    sudo systemctl enable --now snapd.apparmor.service
-    
-    # Install Obsidian
-    sudo snap install obsidian --classic || error "Obsidian installation failed"
-    
-    log "Snap setup completed"
-}
-
 # Main execution
 main() {
     log "Starting system setup..."
@@ -301,14 +306,13 @@ main() {
     sudo chown "$USER:$USER" "$LOG_FILE"
     
     update_system
-    install_yay
+    install_paru
     install_desktop_environment
     install_dev_tools
     setup_terminal
     install_applications
     install_1password
     setup_dotfiles
-    setup_snap
     install_cura
     setup_grub_theme
     install_xone
