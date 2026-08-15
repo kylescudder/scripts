@@ -1,106 +1,203 @@
 #!/usr/bin/env bash
 
-# Set strict error handling
 set -euo pipefail
 
+# -----------------------------------------------------------------------------
 # Configuration
+# -----------------------------------------------------------------------------
+
 EMAIL="kyle@kylescudder.co.uk"
 LOG_FILE="/var/log/system_setup.log"
+
 REPO_DIR="$HOME/Documents/Repos"
+
 DOTFILES_REPO="https://github.com/kylescudder/dotfiles.git"
 SCRIPTS_REPO="https://github.com/kylescudder/scripts.git"
 HERDR_REPO="https://github.com/kylescudder/herdr"
 
-# Logging functions
+INSTALL_USER="$(id -un)"
+INSTALL_GROUP="$(id -gn)"
+
+# -----------------------------------------------------------------------------
+# Bootstrap
+# -----------------------------------------------------------------------------
+
+check_environment() {
+    # makepkg must not run as root.
+    if [[ $EUID -eq 0 ]]; then
+        echo "ERROR: Do not run this script as root."
+        echo
+        echo "Run it as your normal user:"
+        echo
+        echo "    bash install.sh"
+        echo
+        echo "The script will use sudo only where root access is required."
+        exit 1
+    fi
+
+    if ! command -v sudo >/dev/null 2>&1; then
+        echo "ERROR: sudo is not installed."
+        exit 1
+    fi
+
+    echo "Checking sudo access..."
+    sudo -v
+
+    if [[ "$(sudo id -u)" -ne 0 ]]; then
+        echo "ERROR: $INSTALL_USER does not have working sudo access."
+        exit 1
+    fi
+}
+
+init_logging() {
+    sudo touch "$LOG_FILE"
+    sudo chown "$INSTALL_USER:$INSTALL_GROUP" "$LOG_FILE"
+    sudo chmod 0644 "$LOG_FILE"
+}
+
+# -----------------------------------------------------------------------------
+# Logging
+# -----------------------------------------------------------------------------
+
 log() {
     local message="$1"
-    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    local timestamp
+
+    timestamp="$(date '+%Y-%m-%d %H:%M:%S')"
+
     echo "[$timestamp] $message" | tee -a "$LOG_FILE"
 }
 
 error() {
     local message="$1"
+
+    # Avoid recursively triggering ERR while handling an error.
+    trap - ERR
+
     log "ERROR: $message"
-    send_email "Script Error" "An error occurred during system setup: $message"
+
+    send_email \
+        "Script Error" \
+        "An error occurred during system setup: $message"
+
     exit 1
 }
 
 send_email() {
     local subject="$1"
     local body="$2"
-    if command -v mail > /dev/null; then
-        echo "$body" | mail -s "$subject" "$EMAIL"
+
+    if command -v mail >/dev/null 2>&1; then
+        echo "$body" | mail -s "$subject" "$EMAIL" || true
     else
         log "Warning: mail command not found. Could not send email notification."
     fi
 }
 
-# Check if running as root
-check_root() {
-    if [[ $EUID -ne 0 ]]; then
-        error "This script must be run as root"
-    fi
-}
+# -----------------------------------------------------------------------------
+# System
+# -----------------------------------------------------------------------------
 
-# Install AUR helper (paru)
-install_paru() {
-    log "Installing paru AUR helper..."
-    cd "$HOME"
-    git clone https://aur.archlinux.org/paru.git || error "Failed to clone paru repository"
-    cd paru
-    makepkg -si --noconfirm || error "Failed to install paru"
-    cd "$HOME"
-    rm -rf paru
-    log "paru installation completed"
-}
-
-# System update and base packages
 update_system() {
     log "Updating system packages..."
-    sudo pacman -Syu --noconfirm || error "System update failed"
+
+    sudo pacman -Syu --noconfirm \
+        || error "System update failed"
+
     log "System update completed successfully"
 }
 
-# Build dependencies
 install_build_dependencies() {
     log "Installing build dependencies..."
-    sudo pacman -S --needed git base-devel --noconfirm || error "Build dependencies installation failed"
+
+    sudo pacman -S --needed --noconfirm \
+        git \
+        base-devel \
+        curl \
+        || error "Build dependencies installation failed"
+
     log "Build dependencies installation completed"
 }
 
-# Desktop environment setup
+# -----------------------------------------------------------------------------
+# Paru
+# -----------------------------------------------------------------------------
+
+install_paru() {
+    if command -v paru >/dev/null 2>&1; then
+        log "paru is already installed"
+        return
+    fi
+
+    log "Installing paru AUR helper..."
+
+    local build_dir
+    build_dir="$(mktemp -d)"
+
+    git clone https://aur.archlinux.org/paru.git "$build_dir/paru" \
+        || error "Failed to clone paru repository"
+
+    cd "$build_dir/paru"
+
+    # IMPORTANT: deliberately NOT sudo.
+    makepkg -si --noconfirm \
+        || error "Failed to install paru"
+
+    cd "$HOME"
+    rm -rf "$build_dir"
+
+    log "paru installation completed"
+}
+
+# -----------------------------------------------------------------------------
+# Desktop environment
+# -----------------------------------------------------------------------------
+
 install_desktop_environment() {
     log "Installing desktop environment components..."
-    
-    # GNOME
-    sudo pacman -S gnome --noconfirm || error "GNOME installation failed"
-    
-    # Hyprland and related
-    sudo pacman -S hyprland --noconfirm || error "Hyprland installation failed"
-    paru -S hyprland-qtutils --noconfirm || error "Hyprland-qtutils installation failed"
-    
+
+    sudo pacman -S --needed --noconfirm gnome \
+        || error "GNOME installation failed"
+
+    sudo pacman -S --needed --noconfirm hyprland \
+        || error "Hyprland installation failed"
+
+    # Deliberately run paru as the normal user.
+    paru -S --needed --noconfirm hyprland-qtutils \
+        || error "Hyprland-qtutils installation failed"
+
     log "Desktop environment installation completed"
 }
 
-# Development tools setup
+# -----------------------------------------------------------------------------
+# Development tools
+# -----------------------------------------------------------------------------
+
 install_dev_tools() {
     log "Installing development tools..."
-    
-    # Git setup
+
     git config --global user.name "Kyle Scudder"
     git config --global user.email "$EMAIL"
-    
-    # Node.js and related
-    paru -S nodejs npm --noconfirm || error "Node.js installation failed"
-    
-    # .NET
-    paru -S dotnet-runtime dotnet-sdk aspnet-runtime --noconfirm || error ".NET installation failed"
-    
-    # Editors and tools
-    sudo pacman -S neovim lazygit python python-pip fzf --noconfirm || error "Development tools installation failed"
-    
+
+    sudo pacman -S --needed --noconfirm \
+        nodejs \
+        npm \
+        dotnet-runtime \
+        dotnet-sdk \
+        aspnet-runtime \
+        neovim \
+        lazygit \
+        python \
+        python-pip \
+        fzf \
+        || error "Development tools installation failed"
+
     log "Development tools installation completed"
 }
+
+# -----------------------------------------------------------------------------
+# Herdr
+# -----------------------------------------------------------------------------
 
 install_herdr() {
     log "Installing Herdr from $HERDR_REPO..."
@@ -108,7 +205,8 @@ install_herdr() {
     local architecture
     local release_asset
     local download_dir
-    architecture=$(uname -m)
+
+    architecture="$(uname -m)"
 
     case "$architecture" in
         x86_64)
@@ -122,195 +220,330 @@ install_herdr() {
             ;;
     esac
 
-    download_dir=$(mktemp -d) || error "Failed to create Herdr download directory"
-    curl -fL "$HERDR_REPO/releases/latest/download/$release_asset" \
-        -o "$download_dir/herdr" || error "Failed to download Herdr"
-    sudo install -Dm755 "$download_dir/herdr" /usr/local/bin/herdr || error "Failed to install Herdr"
+    download_dir="$(mktemp -d)" \
+        || error "Failed to create Herdr download directory"
+
+    curl -fL \
+        "$HERDR_REPO/releases/latest/download/$release_asset" \
+        -o "$download_dir/herdr" \
+        || error "Failed to download Herdr"
+
+    sudo install \
+        -Dm755 \
+        "$download_dir/herdr" \
+        /usr/local/bin/herdr \
+        || error "Failed to install Herdr"
+
     rm -rf "$download_dir"
 
     log "Herdr installation completed"
 }
 
-# Terminal setup
+# -----------------------------------------------------------------------------
+# Terminal
+# -----------------------------------------------------------------------------
+
 setup_terminal() {
     log "Setting up terminal environment..."
-    
-    # Terminal emulator
-    paru -S ghostty-git --noconfirm || error "Ghostty installation failed"
-    
-    # Shell and prompt
-    paru -S zsh starship --noconfirm || error "Shell tools installation failed"
-    chsh -s /usr/bin/zsh || error "Failed to set ZSH as default shell"
+
+    paru -S --needed --noconfirm ghostty-git \
+        || error "Ghostty installation failed"
+
+    sudo pacman -S --needed --noconfirm zsh starship \
+        || error "Shell tools installation failed"
+
+    sudo chsh -s /usr/bin/zsh "$INSTALL_USER" \
+        || error "Failed to set ZSH as default shell"
 
     install_herdr
 
-    # Bun
-    curl -fsSL https://bun.sh/install | bash
-    
+    log "Installing Bun..."
+
+    curl -fsSL https://bun.sh/install | bash \
+        || error "Bun installation failed"
+
     log "Terminal setup completed"
 }
 
-# GRUB theme setup
+# -----------------------------------------------------------------------------
+# GRUB
+# -----------------------------------------------------------------------------
+
 setup_grub_theme() {
     log "Setting up Catppuccin GRUB theme..."
-    
-    cd "$HOME"
-    git clone https://github.com/catppuccin/grub.git || error "Failed to clone GRUB theme"
-    cd grub
-    
-    sudo cp -r src/* /usr/share/grub/themes/ || error "Failed to copy GRUB themes"
-    
-    # Update GRUB configuration
-    sudo sed -i 's|^GRUB_THEME=.*|GRUB_THEME="/usr/share/grub/themes/catppuccin-mocha-grub-theme\/theme.txt"|' /etc/default/grub
-    # Update GRUB
-    sudo grub-mkconfig -o /boot/grub/grub.cfg || error "Failed to update GRUB configuration"
-    
-    cd "$HOME"
-    rm -rf grub
-    
+
+    local grub_dir
+    grub_dir="$(mktemp -d)"
+
+    git clone \
+        https://github.com/catppuccin/grub.git \
+        "$grub_dir/grub" \
+        || error "Failed to clone GRUB theme"
+
+    sudo cp -r \
+        "$grub_dir/grub/src/"* \
+        /usr/share/grub/themes/ \
+        || error "Failed to copy GRUB themes"
+
+    if grep -q '^GRUB_THEME=' /etc/default/grub; then
+        sudo sed -i \
+            's|^GRUB_THEME=.*|GRUB_THEME="/usr/share/grub/themes/catppuccin-mocha-grub-theme/theme.txt"|' \
+            /etc/default/grub
+    else
+        echo \
+            'GRUB_THEME="/usr/share/grub/themes/catppuccin-mocha-grub-theme/theme.txt"' \
+            | sudo tee -a /etc/default/grub >/dev/null
+    fi
+
+    sudo grub-mkconfig -o /boot/grub/grub.cfg \
+        || error "Failed to update GRUB configuration"
+
+    rm -rf "$grub_dir"
+
     log "GRUB theme setup completed"
 }
 
-# Cura installation
+# -----------------------------------------------------------------------------
+# Cura
+# -----------------------------------------------------------------------------
+
 install_cura() {
     log "Installing Cura..."
-    
-    # Install FUSE dependency
-    sudo pacman -S fuse --noconfirm || error "FUSE installation failed"
-    
-    # Create directory for AppImage
-    mkdir -p "$HOME/.local/share/AppImages" || error "Failed to create AppImage directory"
-    
-    # Download latest Cura
-    curl -L "https://github.com/Ultimaker/Cura/releases/download/5.9.0/UltiMaker-Cura-5.9.0-linux-X64.AppImage" \
-        -o "$HOME/.local/share/AppImage/Cura.AppImage" || error "Failed to download Cura"
-    
-    # Make AppImage executable
-    chmod +x "$HOME/.local/share/AppImage/Cura.AppImage" || error "Failed to make Cura executable"
-    
+
+    sudo pacman -S --needed --noconfirm fuse \
+        || error "FUSE installation failed"
+
+    local appimage_dir="$HOME/.local/share/AppImages"
+
+    mkdir -p "$appimage_dir" \
+        || error "Failed to create AppImage directory"
+
+    curl -fL \
+        "https://github.com/Ultimaker/Cura/releases/download/5.9.0/UltiMaker-Cura-5.9.0-linux-X64.AppImage" \
+        -o "$appimage_dir/Cura.AppImage" \
+        || error "Failed to download Cura"
+
+    chmod +x "$appimage_dir/Cura.AppImage" \
+        || error "Failed to make Cura executable"
+
     log "Cura installation completed"
 }
 
-# xone installation
-install_xone() {
-    log "Installing xone for Xbox controller fireware/drivers..."
-    
-    # Clone the repo
-    git clone https://github.com/dlundqvist/xone
-    
-    # Move into directory then run the install script
-    cd xone
-    sudo ./install.sh
-    
-    # Get fireware 
-    sudo xone-get-fireware.sh
+# -----------------------------------------------------------------------------
+# xone
+# -----------------------------------------------------------------------------
 
-    # Clean up
-    cd ../
-    rm -fr xone
-    
-    log "Xone installation completed"
+install_xone() {
+    log "Installing xone for Xbox controller firmware/drivers..."
+
+    local xone_dir
+    xone_dir="$(mktemp -d)"
+
+    git clone \
+        https://github.com/dlundqvist/xone \
+        "$xone_dir/xone" \
+        || error "Failed to clone xone"
+
+    cd "$xone_dir/xone"
+
+    sudo ./install.sh \
+        || error "xone installation failed"
+
+    sudo xone-get-firmware.sh --skip-disclaimer \
+        || error "xone firmware installation failed"
+
+    cd "$HOME"
+    rm -rf "$xone_dir"
+
+    log "xone installation completed"
 }
 
-# Application installation
+# -----------------------------------------------------------------------------
+# Applications
+# -----------------------------------------------------------------------------
+
 install_applications() {
     log "Installing applications..."
-    
-    # System utilities
-    paru -S stow fastfetch picom feh hyprshot nvidia-open linux-headers yazi btop wlogout --noconfirm || error "System utilities installation failed"
 
-    sudo pacman -S wget --noconfirm || error "System utilities pacman installation failed"
-    
-    # Desktop applications
-    sudo pacman -S vlc obsidian --noconfirm || error "Desktop applications installation failed"
-    paru -S thunderbird --noconfirm || error "Thunderbird failed"
-    
-    # Wayland specific
-    paru -S rofi-wayland waybar swaync hyprlock hypridle hyprpaper --noconfirm || error "Wayland tools installation failed"
-    
-    # Fonts
-    sudo pacman -S ttf-font-awesome --noconfirm || error "Font awesome installation failed"
-    paru -S ttf-meslo-nerd --noconfirm || error "Nerd fonts installation failed"
-    
-    # Music
-    paru -S spotifyd spotify-launcher spicetify-cli pavucontrol --noconfirm || error "Music applications installation failed"
-    
-    # Zen Browser
+    paru -S --needed --noconfirm \
+        stow \
+        fastfetch \
+        picom \
+        feh \
+        hyprshot \
+        nvidia-open \
+        linux-headers \
+        yazi \
+        btop \
+        wlogout \
+        || error "System utilities installation failed"
+
+    sudo pacman -S --needed --noconfirm wget \
+        || error "System utilities pacman installation failed"
+
+    sudo pacman -S --needed --noconfirm \
+        vlc \
+        obsidian \
+        thunderbird \
+        || error "Desktop applications installation failed"
+
+    paru -S --needed --noconfirm \
+        rofi-wayland \
+        waybar \
+        swaync \
+        hyprlock \
+        hypridle \
+        hyprpaper \
+        || error "Wayland tools installation failed"
+
+    sudo pacman -S --needed --noconfirm \
+        ttf-font-awesome \
+        || error "Font Awesome installation failed"
+
+    paru -S --needed --noconfirm \
+        ttf-meslo-nerd \
+        || error "Nerd fonts installation failed"
+
+    paru -S --needed --noconfirm \
+        spotifyd \
+        spotify-launcher \
+        spicetify-cli \
+        pavucontrol \
+        || error "Music applications installation failed"
+
     log "Installing Helium browser..."
-    paru -S heluim-browser-bin
 
-    # SwayNC
-    curl -LO "https://github.com/catppuccin/swaync/releases/latest/download/mocha.css"
-    mkdir -p $HOME/.config/swaync
-    mv mocha.css ~/.config/swaync/style.css
+    paru -S --needed --noconfirm helium-browser-bin \
+        || error "Helium browser installation failed"
+
+    log "Installing SwayNC Catppuccin theme..."
+
+    local swaync_dir="$HOME/.config/swaync"
+
+    mkdir -p "$swaync_dir"
+
+    curl -fL \
+        "https://github.com/catppuccin/swaync/releases/latest/download/mocha.css" \
+        -o "$swaync_dir/style.css" \
+        || error "Failed to install SwayNC theme"
 
     log "Applications installation completed"
 }
 
-# 1Password setup
+# -----------------------------------------------------------------------------
+# 1Password
+# -----------------------------------------------------------------------------
+
 install_1password() {
     log "Installing 1Password..."
-    
-    # Dependencies
-    sudo pacman -S go go-tools xfsprogs apparmor squashfs-tools --noconfirm || error "1Password dependencies installation failed"
-    
-    # Installation
-    cd "$HOME"
-    curl -sS https://downloads.1password.com/linux/keys/1password.asc | gpg --import
-    paru -S 1password --noconfirm || error "1Password installation failed"
-    
+
+    sudo pacman -S --needed --noconfirm \
+        go \
+        go-tools \
+        xfsprogs \
+        apparmor \
+        squashfs-tools \
+        gnupg \
+        || error "1Password dependencies installation failed"
+
+    curl -fsSL \
+        https://downloads.1password.com/linux/keys/1password.asc \
+        | gpg --import \
+        || error "Failed to import 1Password signing key"
+
+    paru -S --needed --noconfirm 1password \
+        || error "1Password installation failed"
+
     log "1Password installation completed"
 }
 
-# Dotfiles setup
+# -----------------------------------------------------------------------------
+# Dotfiles
+# -----------------------------------------------------------------------------
+
 setup_dotfiles() {
     log "Setting up dotfiles..."
-    
+
     mkdir -p "$REPO_DIR"
-    cd "$REPO_DIR"
-    git clone "$DOTFILES_REPO" || error "Dotfiles clone failed"
-    
-    cd ~/Documents/Repos/dotfiles/
 
-    # Remove existing configs
-    rm -f ~/.config/hypr/hyprland.conf
-    rm -f ~/.bashrc
-    
-    # Create symlinks
+    if [[ ! -d "$REPO_DIR/dotfiles/.git" ]]; then
+        git clone "$DOTFILES_REPO" "$REPO_DIR/dotfiles" \
+            || error "Dotfiles clone failed"
+    else
+        log "Dotfiles repository already exists"
+    fi
+
+    cd "$REPO_DIR/dotfiles"
+
+    rm -f "$HOME/.config/hypr/hyprland.conf"
+    rm -f "$HOME/.bashrc"
+
     local stow_targets=(
-        "hyprland" "waybar" "nvim" "spotifyd" "starship"
-        "bashrc" "zsh" "applications" "icons" "wallpapers"
-        "shmux" "fastfetch" "rofi" "yazi" "ghostty" "btop" "wlogout"
+        "hyprland"
+        "waybar"
+        "nvim"
+        "spotifyd"
+        "starship"
+        "bashrc"
+        "zsh"
+        "applications"
+        "icons"
+        "wallpapers"
+        "shmux"
+        "fastfetch"
+        "rofi"
+        "yazi"
+        "ghostty"
+        "btop"
+        "wlogout"
     )
-    
+
     for target in "${stow_targets[@]}"; do
-        stow "$target" -t ~/ || error "Failed to stow $target"
+        stow "$target" -t "$HOME" \
+            || error "Failed to stow $target"
     done
-    
-    stow applications -t "$HOME/.local/share/" || error "Failed to stow shared resources"
-    stow icons -t "$HOME/.local/share/" || error "Failed to stow shared resources"
-    stow wallpapers -t "$HOME/.local/share/" || error "Failed to stow shared resources"
-    sudo stow pixmaps -t "/usr/share/" || error "Failed to stow shared resources"
-    
-    log "Setting up scripts"
-    git clone "$SCRIPTS_REPO" || error "scripts clone failed"
-    
-    cd ~/Documents/Repos/scripts/
 
-    chmod +x songdetails
-    log "scripts setup completed"
+    stow applications -t "$HOME/.local/share/" \
+        || error "Failed to stow applications"
 
+    stow icons -t "$HOME/.local/share/" \
+        || error "Failed to stow icons"
+
+    stow wallpapers -t "$HOME/.local/share/" \
+        || error "Failed to stow wallpapers"
+
+    sudo stow pixmaps -t "/usr/share/" \
+        || error "Failed to stow pixmaps"
+
+    log "Setting up scripts..."
+
+    if [[ ! -d "$REPO_DIR/scripts/.git" ]]; then
+        git clone "$SCRIPTS_REPO" "$REPO_DIR/scripts" \
+            || error "Scripts clone failed"
+    else
+        log "Scripts repository already exists"
+    fi
+
+    chmod +x "$REPO_DIR/scripts/songdetails"
+
+    log "Scripts setup completed"
     log "Dotfiles setup completed"
 }
 
-# Main execution
+# -----------------------------------------------------------------------------
+# Main
+# -----------------------------------------------------------------------------
+
 main() {
-    log "Starting system setup..."
-    
-    # Create log file
-    sudo touch "$LOG_FILE"
-    sudo chown "$USER:$USER" "$LOG_FILE"
-    
+    check_environment
+
+    # MUST happen before the first call to log().
+    init_logging
+
+    trap 'error "An error occurred on line $LINENO. Check the logs for details."' ERR
+
+    log "Starting system setup as $INSTALL_USER..."
+
     update_system
     install_build_dependencies
     install_paru
@@ -323,16 +556,15 @@ main() {
     install_cura
     setup_grub_theme
     install_xone
-    
-    # Enable display manager
-    sudo systemctl enable gdm.service || error "Failed to enable GDM"
-    
+
+    sudo systemctl enable gdm.service \
+        || error "Failed to enable GDM"
+
     log "System setup completed successfully"
-    send_email "System Setup Complete" "The system setup script has completed successfully. Check $LOG_FILE for details."
+
+    send_email \
+        "System Setup Complete" \
+        "The system setup script has completed successfully. Check $LOG_FILE for details."
 }
 
-# Trap errors
-trap 'error "An error occurred on line $LINENO. Check the logs for details."' ERR
-
-# Run main function
 main "$@"
