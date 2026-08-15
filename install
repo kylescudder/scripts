@@ -61,6 +61,13 @@ update_system() {
     log "System update completed successfully"
 }
 
+# Build dependencies
+install_build_dependencies() {
+    log "Installing build dependencies..."
+    sudo pacman -S --needed git base-devel --noconfirm || error "Build dependencies installation failed"
+    log "Build dependencies installation completed"
+}
+
 # Desktop environment setup
 install_desktop_environment() {
     log "Installing desktop environment components..."
@@ -80,7 +87,6 @@ install_dev_tools() {
     log "Installing development tools..."
     
     # Git setup
-    sudo pacman -S --needed git base-devel --noconfirm || error "Git installation failed"
     git config --global user.name "Kyle Scudder"
     git config --global user.email "$EMAIL"
     
@@ -306,6 +312,7 @@ main() {
     sudo chown "$USER:$USER" "$LOG_FILE"
     
     update_system
+    install_build_dependencies
     install_paru
     install_desktop_environment
     install_dev_tools
