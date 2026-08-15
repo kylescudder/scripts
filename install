@@ -301,7 +301,7 @@ install_herdr() {
 setup_terminal() {
     log "Setting up terminal environment..."
 
-    paru -S --needed --noconfirm ghostty-git \
+    sudo pacman -S --needed --noconfirm ghostty \
         || error "Ghostty installation failed"
 
     sudo pacman -S --needed --noconfirm zsh starship \
