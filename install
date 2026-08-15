@@ -675,9 +675,6 @@ setup_dotfiles() {
     stow wallpapers -t "$HOME/.local/share/" \
         || error "Failed to stow wallpapers"
 
-    sudo stow pixmaps -t "/usr/share/" \
-        || error "Failed to stow pixmaps"
-
     log "Setting up scripts..."
 
     if [[ ! -d "$REPO_DIR/scripts/.git" ]]; then
