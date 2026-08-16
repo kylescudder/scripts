@@ -521,6 +521,11 @@ install_applications() {
         || error "Desktop applications installation failed"
 
     paru -S --needed --noconfirm \
+        prismlauncher \
+        vesktop \
+        || error "Gaming and chat applications installation failed"
+
+    paru -S --needed --noconfirm \
         rofi-wayland \
         waybar \
         swaync \
