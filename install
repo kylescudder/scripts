@@ -209,9 +209,46 @@ install_desktop_environment() {
     sudo pacman -S --needed --noconfirm \
         hyprland \
         hyprland-guiutils \
-        || error "Hyprland installation failed"
+        xdg-desktop-portal-hyprland \
+        xdg-desktop-portal-gtk \
+        gnome-themes-extra \
+        || error "Hyprland/Wayland package installation failed"
 
     log "Desktop environment installation completed"
+}
+
+configure_dark_mode() {
+    log "Configuring dark mode for Hyprland/Wayland..."
+
+    if ! command -v gsettings >/dev/null 2>&1; then
+        error "gsettings is unavailable after desktop environment installation"
+    fi
+
+    local gsettings_command=(gsettings)
+
+    # A fresh install may be run from a TTY before the first graphical login.
+    # Use a temporary session bus there so dconf can persist the preferences.
+    if [[ -z "${DBUS_SESSION_BUS_ADDRESS:-}" ]]; then
+        if ! command -v dbus-run-session >/dev/null 2>&1; then
+            error "dbus-run-session is required to configure dark mode from a TTY"
+        fi
+
+        gsettings_command=(dbus-run-session -- gsettings)
+    fi
+
+    "${gsettings_command[@]}" set \
+        org.gnome.desktop.interface \
+        color-scheme \
+        prefer-dark \
+        || error "Failed to set the system color scheme to dark"
+
+    "${gsettings_command[@]}" set \
+        org.gnome.desktop.interface \
+        gtk-theme \
+        Adwaita-dark \
+        || error "Failed to set the GTK theme to Adwaita Dark"
+
+    log "Dark mode configuration completed"
 }
 
 # -----------------------------------------------------------------------------
@@ -735,6 +772,7 @@ main() {
     install_tailscale
     install_paru
     install_desktop_environment
+    configure_dark_mode
     install_dev_tools
     setup_terminal
     install_applications
