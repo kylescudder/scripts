@@ -605,19 +605,44 @@ install_1password() {
 
 remove_stow_conflict() {
     local target="$1"
-    local source="$2"
+    local source="${2:-}"
 
     if [[ ! -e "$target" && ! -L "$target" ]]; then
         return
     fi
 
-    if [[ -L "$target" ]] \
+    if [[ -n "$source" && -L "$target" ]] \
         && [[ "$(readlink -f "$target")" == "$(readlink -f "$source")" ]]; then
         return
     fi
 
     rm -f "$target" \
         || error "Failed to remove conflicting file at $target"
+}
+
+prepare_hyprland_stow() {
+    local package_dir="$REPO_DIR/dotfiles/hyprland/.config/hypr"
+    local active_config
+    local obsolete_config
+
+    if [[ -f "$package_dir/hyprland.lua" ]]; then
+        active_config="hyprland.lua"
+        obsolete_config="hyprland.conf"
+    elif [[ -f "$package_dir/hyprland.conf" ]]; then
+        active_config="hyprland.conf"
+        obsolete_config="hyprland.lua"
+    else
+        error "Hyprland dotfiles contain no supported main configuration"
+    fi
+
+    remove_stow_conflict \
+        "$HOME/.config/hypr/$active_config" \
+        "$package_dir/$active_config"
+
+    # Hyprland prefers hyprland.lua whenever it is present. Remove the config
+    # format not managed by the dotfiles package so it cannot mask the stowed
+    # configuration during a migration in either direction.
+    remove_stow_conflict "$HOME/.config/hypr/$obsolete_config"
 }
 
 setup_dotfiles() {
@@ -634,9 +659,7 @@ setup_dotfiles() {
 
     cd "$REPO_DIR/dotfiles"
 
-    remove_stow_conflict \
-        "$HOME/.config/hypr/hyprland.conf" \
-        "$REPO_DIR/dotfiles/hyprland/.config/hypr/hyprland.conf"
+    prepare_hyprland_stow
 
     remove_stow_conflict \
         "$HOME/.bashrc" \
