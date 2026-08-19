@@ -575,6 +575,13 @@ ensure_steam_data_link() {
         return
     fi
 
+    if [[ ! -L "$link_path" ]] \
+        && [[ -d "$link_path" ]] \
+        && [[ "$(readlink -f "$link_path")" == "$(readlink -f "$target")" ]]; then
+        log "$link_path is the active Steam data directory; leaving it unchanged"
+        return
+    fi
+
     if [[ -L "$link_path" ]] \
         && [[ -d "$link_path" ]] \
         && [[ "$allow_custom_target" == true ]]; then
@@ -657,6 +664,7 @@ install_applications() {
 
     paru -S --needed --noconfirm \
         steam \
+        lib32-nvidia-utils \
         prismlauncher \
         vesktop \
         || error "Gaming and chat applications installation failed"
