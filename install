@@ -130,6 +130,35 @@ send_email() {
 # System
 # -----------------------------------------------------------------------------
 
+multilib_repository_enabled() {
+    pacman-conf --repo-list | grep -Fxq multilib
+}
+
+enable_multilib_repository() {
+    if multilib_repository_enabled; then
+        log "Multilib repository is already enabled"
+        return
+    fi
+
+    if ! grep -Eq '^#?\[multilib\]$' /etc/pacman.conf; then
+        error "Multilib repository configuration was not found in /etc/pacman.conf"
+    fi
+
+    log "Enabling multilib repository..."
+
+    sudo sed -i \
+        -e '/^#\[multilib\]$/s/^#//' \
+        -e '/^\[multilib\]$/,/^$/s/^#Include =/Include =/' \
+        /etc/pacman.conf \
+        || error "Failed to enable the multilib repository"
+
+    if ! multilib_repository_enabled; then
+        error "Multilib repository configuration is incomplete in /etc/pacman.conf"
+    fi
+
+    log "Multilib repository enabled"
+}
+
 update_system() {
     log "Updating system packages..."
 
@@ -532,6 +561,82 @@ install_xone() {
 # Applications
 # -----------------------------------------------------------------------------
 
+ensure_steam_data_link() {
+    local link_path="$1"
+    local target="$2"
+    local allow_custom_target="$3"
+    local backup_path
+    local backup_suffix
+    local counter=0
+
+    if [[ -L "$link_path" ]] \
+        && [[ "$(readlink -f "$link_path")" == "$(readlink -f "$target")" ]]; then
+        log "$link_path already points to $target"
+        return
+    fi
+
+    if [[ ! -L "$link_path" ]] \
+        && [[ -d "$link_path" ]] \
+        && [[ "$(readlink -f "$link_path")" == "$(readlink -f "$target")" ]]; then
+        log "$link_path is the active Steam data directory; leaving it unchanged"
+        return
+    fi
+
+    if [[ -L "$link_path" ]] \
+        && [[ -d "$link_path" ]] \
+        && [[ "$allow_custom_target" == true ]]; then
+        log "$link_path points to a custom Steam data directory; leaving it unchanged"
+        return
+    fi
+
+    if [[ -e "$link_path" || -L "$link_path" ]]; then
+        backup_suffix="$(date '+%Y%m%d-%H%M%S')"
+        backup_path="$link_path.pre-data-link-$backup_suffix"
+
+        while [[ -e "$backup_path" || -L "$backup_path" ]]; do
+            counter=$((counter + 1))
+            backup_path="$link_path.pre-data-link-$backup_suffix-$counter"
+        done
+
+        mv "$link_path" "$backup_path" \
+            || error "Failed to preserve existing Steam path at $link_path"
+
+        log "Preserved existing Steam path at $backup_path"
+    fi
+
+    ln -s "$target" "$link_path" \
+        || error "Failed to link $link_path to $target"
+
+    log "Linked $link_path to $target"
+}
+
+configure_steam_data_links() {
+    log "Configuring Steam data links..."
+
+    local steam_config_directory="$HOME/.steam"
+    local steam_data_directory="$HOME/.local/share/Steam"
+    local steam_link="$steam_config_directory/steam"
+    local steam_root_link="$steam_config_directory/root"
+    local resolved_steam_data_directory
+
+    mkdir -p "$steam_config_directory" "$steam_data_directory" \
+        || error "Failed to create Steam data directories"
+
+    ensure_steam_data_link \
+        "$steam_link" \
+        "$steam_data_directory" \
+        true
+
+    resolved_steam_data_directory="$(readlink -f "$steam_link")"
+
+    ensure_steam_data_link \
+        "$steam_root_link" \
+        "$resolved_steam_data_directory" \
+        false
+
+    log "Steam data links configured"
+}
+
 install_applications() {
     log "Installing applications..."
 
@@ -558,9 +663,13 @@ install_applications() {
         || error "Desktop applications installation failed"
 
     paru -S --needed --noconfirm \
+        steam \
+        lib32-nvidia-utils \
         prismlauncher \
         vesktop \
         || error "Gaming and chat applications installation failed"
+
+    configure_steam_data_links
 
     paru -S --needed --noconfirm \
         rofi-wayland \
@@ -772,6 +881,7 @@ main() {
 
     log "Starting system setup as $INSTALL_USER..."
 
+    enable_multilib_repository
     update_system
     install_build_dependencies
     install_tailscale
