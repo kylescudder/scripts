@@ -18,7 +18,6 @@ REPO_DIR="$HOME/Documents/Repos"
 DOTFILES_REPO="https://github.com/kylescudder/dotfiles.git"
 SCRIPTS_REPO="https://github.com/kylescudder/scripts.git"
 HERDR_REPO="https://github.com/kylescudder/herdr"
-BIDE_REPO="https://github.com/kylescudder/bide.git"
 
 INSTALL_USER="$(id -un)"
 INSTALL_GROUP="$(id -gn)"
@@ -176,7 +175,6 @@ install_build_dependencies() {
         git \
         base-devel \
         curl \
-        rust \
         unzip \
         || error "Build dependencies installation failed"
 
@@ -360,56 +358,6 @@ install_herdr() {
     rm -rf "$download_dir"
 
     log "Herdr installation completed"
-}
-
-# -----------------------------------------------------------------------------
-# Bide
-# -----------------------------------------------------------------------------
-
-install_bide() {
-    local bide_dir="$REPO_DIR/bide"
-    local systemd_user_dir="$HOME/.config/systemd/user"
-
-    log "Installing Bide from $BIDE_REPO..."
-
-    mkdir -p "$REPO_DIR"
-
-    if [[ -d "$bide_dir/.git" ]]; then
-        git -C "$bide_dir" pull --ff-only \
-            || error "Failed to update Bide repository"
-    else
-        git clone "$BIDE_REPO" "$bide_dir" \
-            || error "Failed to clone Bide repository"
-    fi
-
-    cargo build --locked --release --manifest-path "$bide_dir/Cargo.toml" \
-        || error "Failed to build Bide"
-
-    sudo install -Dm755 \
-        "$bide_dir/target/release/bide" \
-        /usr/local/bin/bide \
-        || error "Failed to install Bide executable"
-
-    install -Dm644 \
-        "$bide_dir/systemd/bide.service" \
-        "$systemd_user_dir/bide.service" \
-        || error "Failed to install Bide user service"
-
-    install -Dm644 \
-        "$bide_dir/systemd/bide.timer" \
-        "$systemd_user_dir/bide.timer" \
-        || error "Failed to install Bide user timer"
-
-    systemctl --user daemon-reload \
-        || error "Failed to reload user systemd units"
-
-    systemctl --user enable --now bide.timer \
-        || error "Failed to enable Bide user timer"
-
-    command -v bide >/dev/null 2>&1 \
-        || error "Bide executable is not available on PATH"
-
-    log "Bide installation completed"
 }
 
 # -----------------------------------------------------------------------------
@@ -702,6 +650,7 @@ install_applications() {
         linux-headers \
         yazi \
         btop \
+        bide \
         wlogout \
         || error "System utilities installation failed"
 
@@ -727,8 +676,6 @@ install_applications() {
         rofi-wayland \
         waybar \
         swaync \
-        libnotify \
-        libcanberra \
         hyprlock \
         hypridle \
         hyprpaper \
@@ -945,7 +892,6 @@ main() {
     install_dev_tools
     setup_terminal
     install_applications
-    install_bide
     install_1password
     setup_dotfiles
     install_cura
