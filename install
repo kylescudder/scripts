@@ -858,11 +858,6 @@ setup_dotfiles() {
         log "Scripts repository already exists"
     fi
 
-    if [[ ! -x "$REPO_DIR/scripts/songdetail" ]]; then
-        chmod +x "$REPO_DIR/scripts/songdetail" \
-            || error "Failed to make songdetail executable"
-    fi
-
     log "Scripts setup completed"
     log "Dotfiles setup completed"
 }
